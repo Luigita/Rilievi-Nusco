@@ -1,3 +1,4 @@
+import 'package:applicazione_prova/mio_database.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:async';
@@ -6,7 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'database.dart';
+import 'mio_database.dart';
+//import 'database.dart';
 //import 'article_repository.dart';
 
 Future main() async {
@@ -14,7 +16,7 @@ Future main() async {
   // Importing 'package:flutter/widgets.dart' is required.
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
-  await DBHelper().initDatabase();
+  //await DBHelper().initDatabase();
   //Future pathDatabase = DBHelper().getDatabasePath('personale');
   //print(db);
   //InserimentoTesto.inserimenti()
@@ -166,6 +168,25 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
         body: ListView(
           padding: const EdgeInsets.only(top: 20, left:10 , right: 10),
           children: <Widget>[
+            FutureBuilder<List<Operaio>>(
+              future: DBHelper.instance.getOperai(),
+                builder: (BuildContext context, AsyncSnapshot<List<Operaio>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(child: Text('Caricamento ...'));
+                  }
+                  return snapshot.data!.isEmpty
+                    ? Center(child: Text('Nessun operaio in lista.'),)
+                    : ListView(
+                      children: snapshot.data!.map((operaio) {
+                        return Center(
+                          child: ListTile(
+                            title: Text(operaio.nome),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                }
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -177,12 +198,15 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   //scrollPadding: EdgeInsets.zero,
                   autofocus: true,
                   //decoration:,
-                  onSubmitted: (String stringa){
+                  onSubmitted: (String stringa) async {
+                    await DBHelper.instance.add(
+                      Operaio(nome: stringa, cognome: 'cognome')
+                    );
                     context: context;
                     setState(() {
                       nomeUtente = stringa;
-                      Article articolo = Article(0, nomeUtente, 'pippo');
-                      ArticleRepository.addArticle(articolo);
+                      //Article articolo = Article(0, nomeUtente, 'pippo');
+                      //ArticleRepository.addArticle(articolo);
                       //ArticleRepository.printDatabase();
                       //InserimentoTesto.inserimenti(nomeUtente);
                     });
