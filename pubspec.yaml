@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   firebase_core: ^2.7.0
   firebase_database: ^10.0.14
+  camera:
   sqflite:
   path:
 

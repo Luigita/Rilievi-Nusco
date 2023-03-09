@@ -15,7 +15,14 @@ Future main() async {
   // Avoid errors caused by flutter upgrade.
   // Importing 'package:flutter/widgets.dart' is required.
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    title: 'TITOLO APPLICAZIONE',
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: (Colors.green)),
+      useMaterial3: true,
+    ),
+    home: InserimentoTesto(title: 'Nome Applicazione',),
+  ));
   //await DBHelper().initDatabase();
   //Future pathDatabase = DBHelper().getDatabasePath('personale');
   //print(db);
@@ -112,22 +119,22 @@ Future main() async {
 //   }
 // }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HELLO WORLD',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
-      home: InserimentoTesto(title: "Nome Applicazione"),
-    );
-  }
-}
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   // This widget is the root of your application.
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'HELLO WORLD',
+//       theme: ThemeData(
+//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+//         useMaterial3: true,
+//       ),
+//       home: InserimentoTesto(title: "Nome Applicazione"),
+//     );
+//   }
+// }
 
 class InserimentoTesto extends StatefulWidget {
   InserimentoTesto({super.key, required this.title});
@@ -147,16 +154,19 @@ class InserimentoTesto extends StatefulWidget {
 
 class _InserimentoTestoState extends State<InserimentoTesto> {
 
-  late TextEditingController _controller;
+  //late TextEditingController _controller;
   String numeroUtente = '';
   String nomeUtente = '';
 
+  int? selectedId;
+  final textController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _controller = TextEditingController();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +178,113 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
         body: ListView(
           padding: const EdgeInsets.only(top: 20, left:10 , right: 10),
           children: <Widget>[
+            Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                "SCRIVI QUI:",
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                controller: textController,
+                //scrollPadding: EdgeInsets.zero,
+                autofocus: true,
+                //decoration:,
+                onSubmitted: (String stringa) async {
+                  await DBHelper.instance.add(
+                      Operaio(nome: stringa, cognome: 'cognome')
+                  );
+                  context: context;
+                  setState(() {
+                    nomeUtente = stringa;
+                    //Article articolo = Article(0, nomeUtente, 'pippo');
+                    //ArticleRepository.addArticle(articolo);
+                    //ArticleRepository.printDatabase();
+                    //InserimentoTesto.inserimenti(nomeUtente);
+                  });
+                },
+              ),
+              Text(
+                  nomeUtente
+              ),
+              const Divider(),
+              const Text(
+                "SCRIVI QUI:",
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                //scrollPadding: EdgeInsets.zero,
+                autofocus: true,
+                //decoration:,
+                onSubmitted: (String stringa){
+                  context: context;
+                  setState(() {
+                    numeroUtente = stringa;
+                    //InserimentoTesto.inserimenti(numeroUtente);
+                  });
+                },
+              ),
+              Text(
+                  numeroUtente
+              ),
+              const Divider(),
+              const Text(
+                "SCRIVI QUI:",
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                //scrollPadding: EdgeInsets.zero,
+                autofocus: true,
+                //decoration:,
+                onSubmitted: (String stringa){
+                  context: context;
+                  setState(() {
+                    numeroUtente = stringa;
+                    //InserimentoTesto.inserimenti(numeroUtente);
+                  });
+                },
+              ),
+              Text(
+                  numeroUtente
+              ),
+              const Divider(),
+              const Text(
+                "SCRIVI QUI:",
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                //scrollPadding: EdgeInsets.zero,
+                autofocus: true,
+                //decoration:,
+                onSubmitted: (String stringa){
+                  context: context;
+                  setState(() {
+                    numeroUtente = stringa;
+                  });
+                },
+              ),
+              Text(
+                  numeroUtente
+              ),
+              const Divider(),
+              const Text(
+                  "SCRIVI QUI:"
+              ),
+              TextField(
+                //scrollPadding: const EdgeInsets.all(50),
+                onSubmitted: (String stringa){
+                  context: context;
+                  setState(() {
+                    nomeUtente = stringa;
+                  }
+                  );
+                },
+              ),
+              Text(
+                  nomeUtente
+              ),
+            ],
+          ),
             FutureBuilder<List<Operaio>>(
               future: DBHelper.instance.getOperai(),
                 builder: (BuildContext context, AsyncSnapshot<List<Operaio>> snapshot) {
@@ -187,112 +304,6 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                     );
                 }
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Text(
-                  "SCRIVI QUI:",
-                  textAlign: TextAlign.left,
-                ),
-                TextField(
-                  //scrollPadding: EdgeInsets.zero,
-                  autofocus: true,
-                  //decoration:,
-                  onSubmitted: (String stringa) async {
-                    await DBHelper.instance.add(
-                      Operaio(nome: stringa, cognome: 'cognome')
-                    );
-                    context: context;
-                    setState(() {
-                      nomeUtente = stringa;
-                      //Article articolo = Article(0, nomeUtente, 'pippo');
-                      //ArticleRepository.addArticle(articolo);
-                      //ArticleRepository.printDatabase();
-                      //InserimentoTesto.inserimenti(nomeUtente);
-                    });
-                    },
-                ),
-                Text(
-                    nomeUtente
-                ),
-                const Divider(),
-                const Text(
-                  "SCRIVI QUI:",
-                  textAlign: TextAlign.left,
-                ),
-                TextField(
-                  //scrollPadding: EdgeInsets.zero,
-                  autofocus: true,
-                  //decoration:,
-                  onSubmitted: (String stringa){
-                    context: context;
-                    setState(() {
-                      numeroUtente = stringa;
-                      //InserimentoTesto.inserimenti(numeroUtente);
-                    });
-                    },
-                ),
-                Text(
-                    numeroUtente
-                ),
-                const Divider(),
-                const Text(
-                  "SCRIVI QUI:",
-                  textAlign: TextAlign.left,
-                ),
-                TextField(
-                  //scrollPadding: EdgeInsets.zero,
-                  autofocus: true,
-                  //decoration:,
-                  onSubmitted: (String stringa){
-                    context: context;
-                    setState(() {
-                      numeroUtente = stringa;
-                      //InserimentoTesto.inserimenti(numeroUtente);
-                    });
-                    },
-                ),
-                Text(
-                    numeroUtente
-                ),
-                const Divider(),
-                const Text(
-                  "SCRIVI QUI:",
-                  textAlign: TextAlign.left,
-                ),
-                TextField(
-                  //scrollPadding: EdgeInsets.zero,
-                  autofocus: true,
-                  //decoration:,
-                  onSubmitted: (String stringa){
-                    context: context;
-                    setState(() {
-                      numeroUtente = stringa;
-                    });
-                    },
-                ),
-                Text(
-                    numeroUtente
-                ),
-                const Divider(),
-                const Text(
-                    "SCRIVI QUI:"
-                ),
-                TextField(
-                  //scrollPadding: const EdgeInsets.all(50),
-                  onSubmitted: (String stringa){
-                    context: context;
-                    setState(() {
-                      nomeUtente = stringa;
-                      }
-                    );
-                    },
-                ),
-                Text(
-                    nomeUtente
-                ),
-              ],
-            )
           ]
         )
     );

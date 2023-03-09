@@ -26,7 +26,7 @@ class Operaio {
     return{
       'id': id,
       'name': nome,
-      //'cognome': cognome,
+      'cognome': cognome,
     };
   }
 
