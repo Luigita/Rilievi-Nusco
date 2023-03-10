@@ -63,7 +63,8 @@ class DBHelper{
       CREATE TABLE operai(
         id INTEGER PRIMARY KEY,
         name TEXT,
-        cognome TEXT
+        cognome TEXT,
+        foto BLOB
       )
     ''');
   }
@@ -90,5 +91,10 @@ class DBHelper{
   Future<int> update(Operaio operaio) async {
     Database db = await instance.database;
     return await db.update('operai', operaio.toMap(), where: 'id = ?', whereArgs: [operaio.id]);
+  }
+
+  Future<int> deleteAll() async {
+    Database db = await instance.database;
+    return await db.delete('operai');
   }
 }

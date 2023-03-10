@@ -72,6 +72,7 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
             ListView(
               padding: const EdgeInsets.only(top: 20, left:10 , right: 10),
               children: [
+                //TODO aggiungere gli altri campi da alimentare
                 const Text('NOME'),
                 TextField(
                   autofocus: true,
@@ -138,22 +139,41 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
               ],
             ),
         ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.save),
-          onPressed: () async {
-            selectedId != null
-                ? await DBHelper.instance.update(
-              Operaio(id: selectedId, nome: textController[0].text, cognome: textController[1].text),
-            )
-                : await DBHelper.instance.add(
-              Operaio(nome: textController[0].text, cognome: textController[1].text),
-            );
-            setState(() {
-              textController[0].clear();
-              textController[1].clear();
-              selectedId = null;
-            });
-          },
+        //TODO implementare finestra sei sicuro
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.delete_forever),
+              onPressed: () async {
+                await DBHelper.instance.deleteAll();
+                setState(() {
+                  textController[0].clear();
+                  textController[1].clear();
+                  selectedId = null;
+                });
+              },
+            ),
+            FloatingActionButton(
+              child: const Icon(Icons.save),
+              onPressed: () async {
+                selectedId != null
+                    ? await DBHelper.instance.update(
+                  Operaio(id: selectedId, nome: textController[0].text, cognome: textController[1].text),
+                )
+                    : await DBHelper.instance.add(
+                  Operaio(nome: textController[0].text, cognome: textController[1].text),
+                );
+                setState(() {
+                  textController[0].clear();
+                  textController[1].clear();
+                  selectedId = null;
+                });
+              },
+            ),
+          ],
         ),
       ),
     );
