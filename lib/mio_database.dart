@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -9,17 +10,20 @@ class Operaio {
   @required
   final int? id;
   @required
-  String nome;
+  String? nome;
   @required
-  String cognome;
+  String? cognome;
+
+  Uint8List? blob;
 
   //costrutore
-  Operaio({this.id, required this.nome, required this.cognome});
+  Operaio({this.id, this.nome, this.cognome, this.blob});
 
   factory Operaio.fromMap(Map<String, dynamic> json) => Operaio(
     id: json['id'],
     nome: json['name'],
     cognome: json['cognome'],
+    blob: json['foto'],
   );
 
   Map<String, dynamic> toMap(){
@@ -27,17 +31,19 @@ class Operaio {
       'id': id,
       'name': nome,
       'cognome': cognome,
+      'foto': blob,
     };
   }
 
   Operaio.fromMapObject(Map<String, dynamic> mappaOperai)
       : id = mappaOperai['id'],
         nome = mappaOperai['name'],
-        cognome = mappaOperai['cognome'];
+        cognome = mappaOperai['cognome'],
+        blob = mappaOperai['foto'];
 
   @override
   String toString(){
-    return 'Operaio{id: $id, name: $nome, cognome: $cognome}';
+    return 'Operaio{id: $id, name: $nome, cognome: $cognome, foto: $blob}';
   }
 }
 
@@ -97,4 +103,9 @@ class DBHelper{
     Database db = await instance.database;
     return await db.delete('operai');
   }
+
+  // Future<int> addPhoto() async {
+  //   Database db = await instance.database;
+  //   return await db.update('operai', );
+  // }
 }

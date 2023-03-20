@@ -75,7 +75,6 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                 //TODO aggiungere gli altri campi da alimentare
                 const Text('NOME'),
                 TextField(
-                  autofocus: true,
                   controller: textController[0],
                   // onSubmitted: (String stringa) async{
                   //   await DBHelper.instance.add(
