@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
+//import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -9,12 +9,12 @@ import 'package:path_provider/path_provider.dart';
 class Operaio {
   @required
   final int? id;
-  @required
+  //@required
   String? nome;
-  @required
+  //@required
   String? cognome;
 
-  Uint8List? blob;
+  String? blob;
 
   //costrutore
   Operaio({this.id, this.nome, this.cognome, this.blob});
@@ -70,7 +70,7 @@ class DBHelper{
         id INTEGER PRIMARY KEY,
         name TEXT,
         cognome TEXT,
-        foto BLOB
+        foto TEXT
       )
     ''');
   }
@@ -82,6 +82,15 @@ class DBHelper{
       ? operai.map((c) => Operaio.fromMap(c)).toList()
         : [];
     return listaOperai;
+  }
+
+  Future<Operaio?> getOperaio(int id) async {
+    Database db = await instance.database;
+    var result = await db.query('operai', where: 'id = ?', whereArgs: [id]);
+    if (result.isNotEmpty) {
+      return Operaio.fromMap(result.first);
+    }
+    return null;
   }
 
   Future<int> add(Operaio operaio) async {

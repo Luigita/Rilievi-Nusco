@@ -1,11 +1,21 @@
-import 'dart:async';
 import 'dart:convert';
 
-import 'package:applicazione_prova/fotocamera.dart';
 import 'package:applicazione_prova/mio_database.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:signature/signature.dart';
+
+import 'dart:async';
+import 'dart:io';
+
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+//import 'foto.dart';
+import '__main.dart';
+import 'mio_database.dart';
 
 Future main() async {
   // Avoid errors caused by flutter upgrade.
@@ -53,7 +63,7 @@ class InserimentoTesto extends StatefulWidget {
 }
 
 class _InserimentoTestoState extends State<InserimentoTesto> {
-  CameraController? _cameraController;
+  late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
   int? selectedId;
@@ -79,8 +89,8 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
   @override
   void initState() {
     super.initState();
-    _cameraController = CameraController(widget.camera, ResolutionPreset.medium);
-    _initializeControllerFuture = _cameraController!.initialize();
+    _controller = CameraController(widget.camera, ResolutionPreset.medium);
+    _initializeControllerFuture = _controller.initialize();
   }
 
   // @override
@@ -103,16 +113,12 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   onPressed: () async {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => DisplayData(
-                          initializeControllerFuture: _initializeControllerFuture,
-                          mounted: mounted,
-                          cameraController: _cameraController,
-                          selectedId: selectedId,
-                        ),
+                        builder: (context) => DisplayData(),
                       ),
                     );
                   },
-                  child: const Text('Dati Salvati')),
+                  child: const Text('Dati Salvati')
+              ),
             ],
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(widget.title),
@@ -121,6 +127,7 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
             child: ListView(
               padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
               children: [
+                //TODO aggiungere gli altri campi da alimentare
                 const Text('NOME'),
                 TextField(
                   controller: textController[0],
@@ -141,6 +148,65 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   // },
                 ),
                 const Divider(),
+
+                ////////////////
+                // FOTOCAMERA //
+                ////////////////
+
+                Column(
+                  children: [
+                    FutureBuilder<void>(
+                        future: _initializeControllerFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            return CameraPreview(_controller);
+                          } else {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        }),
+                    FloatingActionButton(
+                      // Provide an onPressed callback.
+                      onPressed: () async {
+                        // Take the Picture in a try / catch block. If anything goes wrong,
+                        // catch the error.
+                        try {
+                          // Ensure that the camera is initialized.
+                          await _initializeControllerFuture;
+
+                          // Attempt to take a picture and get the file `image`
+                          // where it was saved.
+                          final image = await _controller.takePicture();
+
+                          if (!mounted) return;
+
+                          //SALVA L'IMMAGINE NELLA GALLERIA
+                          GallerySaver.saveImage(image.path, albumName: 'RILIEVI');
+
+                          final bytes = await File(image.path).readAsBytes();
+
+                          final base64Image = base64Encode(bytes);
+
+                          // If the picture was taken, display it on a new screen.
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => DisplayPictureScreen(
+                                id: selectedId,
+                                // Pass the automatically generated path to
+                                // the DisplayPictureScreen widget.
+                                base64Image: base64Image,
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          // If an error occurs, log the error to the console.
+                          print(e);
+                        }
+                      },
+                      child: const Icon(Icons.camera_alt),
+                    ),
+                  ],
+                ),
                 FutureBuilder<List<Operaio>>(
                     future: DBHelper.instance.getOperai(),
                     builder: (BuildContext context,
@@ -158,9 +224,8 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                                         ? Colors.white70
                                         : Colors.white,
                                     child: ListTile(
-                                      title: Text(operaio.nome! +
-                                          ' ' +
-                                          operaio.cognome!),
+                                      title: Text(
+                                          operaio.nome! + ' ' + operaio.cognome!),
                                       onTap: () {
                                         setState(() {
                                           if (selectedId == null) {
@@ -196,6 +261,8 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
               ],
             ),
           ),
+
+          //TODO implementare finestra sei sicuro, non refresha lo stato
           floatingActionButton: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -208,9 +275,10 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   backgroundColor: Colors.red,
                   child: const Icon(Icons.delete_forever),
                   onPressed: () {
-                    dialogAlertButton(context, textController, selectedId);
-                    setState(() {});
-                  },
+                    setState(() {
+                      dialogAlertButton(context, textController, selectedId);
+                    });
+                    },
                 ),
               ),
               GestureDetector(
@@ -222,12 +290,12 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   onPressed: () async {
                     selectedId != null
                         ? await DBHelper.instance.update(
-                            Operaio(
-                              id: selectedId,
-                              nome: textController[0].text,
-                              cognome: textController[1].text,
-                            ),
-                          )
+                      Operaio(
+                          id: selectedId,
+                          nome: textController[0].text,
+                          cognome: textController[1].text,
+                      ),
+                    )
                         : await DBHelper.instance.add(
                             Operaio(
                                 nome: textController[0].text,
@@ -249,50 +317,6 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
   }
 }
 
-void displayPicture(context, String base64Image, int? id) {
-  @override
-  var widget = Scaffold(
-    appBar: AppBar(title: Text(base64Image.toString())),
-    body: Column(
-      children: [
-        Image.memory(base64Decode(base64Image)),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(onPressed: () async {
-      try {
-        Operaio? operaio = await DBHelper.instance.getOperaio(id!);
-
-        id != null
-            ? await DBHelper.instance.update(
-                Operaio(
-                  id: id,
-                  nome: operaio?.nome,
-                  cognome: operaio?.cognome,
-                  blob: base64Image,
-                ),
-              )
-            : await DBHelper.instance.update(
-                Operaio(
-                  id: id,
-                  nome: operaio?.nome,
-                  cognome: operaio?.cognome,
-                  blob: base64Image,
-                ),
-              );
-        Navigator.of(context).pop();
-      } catch (e) {
-        print(e);
-      }
-    }),
-  );
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return widget;
-      });
-  //restituisce la stringa base64 dell'immagine
-}
-
 class DisplayPictureScreen extends StatelessWidget {
   final String base64Image;
   final int? id;
@@ -309,40 +333,25 @@ class DisplayPictureScreen extends StatelessWidget {
       body: Column(
         children: [
           //Text(imagePath.toString()),
-          Image.memory(base64Decode(base64Image)),
+          Image.file(File(base64Image)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: id == null
-            ? const Icon(Icons.save, color: Colors.red)
-            : const Icon(Icons.save, color: Colors.white),
+        child: const Icon(Icons.save),
         onPressed: () async {
-          try {
-            Operaio? operaio = await DBHelper.instance.getOperaio(id!);
-
-            id != null
-                ? await DBHelper.instance.update(
-                    Operaio(
-                      id: id,
-                      nome: operaio?.nome,
-                      cognome: operaio?.cognome,
-                      blob: base64Image,
-                    ),
-                  )
-                : await DBHelper.instance.update(
-                    Operaio(
-                      id: id,
-                      nome: operaio?.nome,
-                      cognome: operaio?.cognome,
-                      blob: base64Image,
-                    ),
-                  );
-            Navigator.of(context).pop();
-          } catch (e) {
-            print(e);
-            Navigator.of(context).pop();
-            // TODO
-          }
+          id != null
+              ? await DBHelper.instance.update(
+            Operaio(
+              id: id,
+              blob: base64Image,
+            ),
+          )
+              : await DBHelper.instance.add(
+            Operaio(
+              id: id,
+              blob: base64Image,
+            ),
+          );
         },
       ),
     );
@@ -350,24 +359,12 @@ class DisplayPictureScreen extends StatelessWidget {
 }
 
 class DisplayData extends StatelessWidget {
-
-  DisplayData({
-    super.key,
-    required Future<void> initializeControllerFuture,
-    required CameraController? cameraController,
-    required this.mounted,
-    required this.selectedId,
-  })  : _initializeControllerFuture = initializeControllerFuture,
-        _cameraController = cameraController;
-
-  final Future<void> _initializeControllerFuture;
-  final CameraController? _cameraController;
-  final bool mounted;
-  final int? selectedId;
+  DisplayData({super.key});
 
   final operai = DBHelper.instance.getOperai();
 
-  //get selectedId => null;
+  get selectedId => null;
+
 
   @override
   Widget build(BuildContext context) {
@@ -377,107 +374,93 @@ class DisplayData extends StatelessWidget {
       ),
       body: FutureBuilder<List<Operaio>>(
           future: DBHelper.instance.getOperai(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Operaio>> snapshot) {
+          builder: (BuildContext context,
+              AsyncSnapshot<List<Operaio>> snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: Text('Caricamento...'));
             }
             return snapshot.data!.isEmpty
                 ? const Center(child: Text('Nessun operaio in lista'))
                 : Column(
-                    children: snapshot.data!.map((operaio) {
-                      return Center(
-                        child: Card(
-                          color: Colors.white70,
-                          child: ListTile(
-                            title: Text(operaio.nome! + ' ' + operaio.cognome!),
-                            trailing: FloatingActionButton(
-                              mini: true,
-                              onPressed: () async {
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => Fotocamera(
-                                      initializeControllerFuture: _initializeControllerFuture,
-                                      mounted: mounted,
-                                      selectedId: operaio.id,
-                                      controller: _cameraController,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Icon(Icons.add_a_photo),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
+              children: snapshot.data!.map((operaio) {
+                return Center(
+                  child: Card(
+                    color: selectedId == operaio.id
+                        ? Colors.white70
+                        : Colors.white,
+                    child: ListTile(
+                      title: Text(
+                          operaio.nome! + ' ' + operaio.cognome!),
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
           }),
     );
   }
 }
 
+//TODO: disegno tramite signature widget
+
 //class SignatureWidget extends StatefulWidget{}
 
-void dialogAlertButton(
-    context, List<TextEditingController> textController, int? selectedId) {
+//TODO: implementare salvataggio database in excel
+
+void dialogAlertButton(context, List<TextEditingController> textController, int? selectedId) {
+
   @override
-  var dialog = SimpleDialog(
-    title: const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.warning),
-            Text(
-              "ATTENZIONE",
-            ),
-            Icon(Icons.warning),
-          ],
-        ),
-      ],
-    ),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15),
-    ),
-    backgroundColor: Colors.white,
-    elevation: 10,
-    children: [
-      const Text(
-        "Stai per eliminare tutti i dati salvati. Continuare?",
-        style: TextStyle(fontSize: 15),
-        textAlign: TextAlign.center,
-      ),
-      const Divider(
-        thickness: 1,
-      ),
-      ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: [
-          FloatingActionButton(
-            child: const Icon(Icons.check),
-            onPressed: () async {
-              await DBHelper.instance.deleteAll();
-              textController[0].clear();
-              textController[1].clear();
-              selectedId = null;
-              Navigator.of(context).pop();
-            },
-          ),
-          FloatingActionButton(
-            child: const Icon(Icons.highlight_remove),
-            onPressed: () async {
-              Navigator.of(context).pop();
-            },
+     var dialog = SimpleDialog(
+      title: const Row(
+        children: <Widget>[
+          //TODO: CAMBIARE ICONA
+          Icon(Icons.error_outline),
+          Text(
+            "ATTENZIONE",
           )
         ],
-      )
-    ],
-  );
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return dialog;
-      });
-}
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      backgroundColor: Colors.white,
+      elevation: 10,
+      children: [
+        const Text(
+          "Stai per eliminare tutti i dati salvati. Continuare?",
+          style: TextStyle(fontSize: 15),
+          textAlign: TextAlign.center,
+        ),
+        const Divider(
+          thickness: 1,
+        ),
+        ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton(
+              child: const Icon(Icons.check),
+              onPressed: () async {
+                await DBHelper.instance.deleteAll();
+                textController[0].clear();
+                textController[1].clear();
+                selectedId = null;
+                Navigator.of(context).pop();
+              },
+            ),
+            FloatingActionButton(
+              child: const Icon(Icons.highlight_remove),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        )
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return dialog;
+        });
+  }
+
