@@ -192,7 +192,7 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                 //decoration:,
                 onSubmitted: (String stringa) async {
                   await DBHelper.instance.add(
-                      Operaio(nome: stringa, cognome: 'cognome')
+                      Rilievo(nome: stringa, cognome: 'cognome')
                   );
                   context: context;
                   setState(() {
@@ -285,9 +285,9 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
               ),
             ],
           ),
-            FutureBuilder<List<Operaio>>(
-              future: DBHelper.instance.getOperai(),
-                builder: (BuildContext context, AsyncSnapshot<List<Operaio>> snapshot) {
+            FutureBuilder<List<Rilievo>>(
+              future: DBHelper.instance.getRilievi(),
+                builder: (BuildContext context, AsyncSnapshot<List<Rilievo>> snapshot) {
                   if (!snapshot.hasData) {
                     return Center(child: Text('Caricamento ...'));
                   }

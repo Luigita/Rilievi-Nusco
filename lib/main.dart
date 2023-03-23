@@ -7,6 +7,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
+import 'disegno.dart';
+
 Future main() async {
   // Avoid errors caused by flutter upgrade.
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +54,9 @@ class InserimentoTesto extends StatefulWidget {
   _InserimentoTestoState createState() => _InserimentoTestoState();
 }
 
-class _InserimentoTestoState extends State<InserimentoTesto> {
+class _InserimentoTestoState extends State<InserimentoTesto>
+  with WidgetsBindingObserver {
+
   CameraController? _cameraController;
   late Future<void> _initializeControllerFuture;
 
@@ -73,13 +77,16 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
   @override
   void dispose() {
     _signatureController.dispose();
+    _cameraController?.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _cameraController = CameraController(widget.camera, ResolutionPreset.medium);
+    _cameraController = CameraController(
+        widget.camera, ResolutionPreset.medium
+    );
     _initializeControllerFuture = _cameraController!.initialize();
   }
 
@@ -99,12 +106,13 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
         child: Scaffold(
           appBar: AppBar(
             actions: [
-              OutlinedButton(
+              ElevatedButton(
                   onPressed: () async {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => DisplayData(
-                          initializeControllerFuture: _initializeControllerFuture,
+                          initializeControllerFuture:
+                            _initializeControllerFuture,
                           mounted: mounted,
                           cameraController: _cameraController,
                           selectedId: selectedId,
@@ -141,34 +149,34 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   // },
                 ),
                 const Divider(),
-                FutureBuilder<List<Operaio>>(
-                    future: DBHelper.instance.getOperai(),
+                FutureBuilder<List<Rilievo>>(
+                    future: DBHelper.instance.getRilievi(),
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<Operaio>> snapshot) {
+                        AsyncSnapshot<List<Rilievo>> snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: Text('Caricamento...'));
                       }
                       return snapshot.data!.isEmpty
-                          ? const Center(child: Text('Nessun operaio in lista'))
+                          ? const Center(child: Text('Lista vuota'))
                           : Column(
-                              children: snapshot.data!.map((operaio) {
+                              children: snapshot.data!.map((rilievo) {
                                 return Center(
                                   child: Card(
-                                    color: selectedId == operaio.id
+                                    color: selectedId == rilievo.id
                                         ? Colors.white70
                                         : Colors.white,
                                     child: ListTile(
-                                      title: Text(operaio.nome! +
-                                          ' ' +
-                                          operaio.cognome!),
+                                      title: Text(
+                                          '${rilievo.nome!} ${rilievo.cognome!}'
+                                      ),
                                       onTap: () {
                                         setState(() {
                                           if (selectedId == null) {
                                             textController[0].text =
-                                                operaio.nome!;
+                                                rilievo.nome!;
                                             textController[1].text =
-                                                operaio.cognome!;
-                                            selectedId = operaio.id;
+                                                rilievo.cognome!;
+                                            selectedId = rilievo.id;
                                           } else {
                                             textController[0].text = '';
                                             textController[1].text = '';
@@ -178,7 +186,7 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                                       },
                                       onLongPress: () {
                                         setState(() {
-                                          DBHelper.instance.remove(operaio.id!);
+                                          DBHelper.instance.remove(rilievo.id!);
                                         });
                                       },
                                     ),
@@ -222,14 +230,14 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   onPressed: () async {
                     selectedId != null
                         ? await DBHelper.instance.update(
-                            Operaio(
+                            Rilievo(
                               id: selectedId,
                               nome: textController[0].text,
                               cognome: textController[1].text,
                             ),
                           )
                         : await DBHelper.instance.add(
-                            Operaio(
+                            Rilievo(
                                 nome: textController[0].text,
                                 cognome: textController[1].text),
                           );
@@ -249,49 +257,49 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
   }
 }
 
-void displayPicture(context, String base64Image, int? id) {
-  @override
-  var widget = Scaffold(
-    appBar: AppBar(title: Text(base64Image.toString())),
-    body: Column(
-      children: [
-        Image.memory(base64Decode(base64Image)),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(onPressed: () async {
-      try {
-        Operaio? operaio = await DBHelper.instance.getOperaio(id!);
-
-        id != null
-            ? await DBHelper.instance.update(
-                Operaio(
-                  id: id,
-                  nome: operaio?.nome,
-                  cognome: operaio?.cognome,
-                  blob: base64Image,
-                ),
-              )
-            : await DBHelper.instance.update(
-                Operaio(
-                  id: id,
-                  nome: operaio?.nome,
-                  cognome: operaio?.cognome,
-                  blob: base64Image,
-                ),
-              );
-        Navigator.of(context).pop();
-      } catch (e) {
-        print(e);
-      }
-    }),
-  );
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return widget;
-      });
-  //restituisce la stringa base64 dell'immagine
-}
+// void displayPicture(context, String base64Image, int? id) {
+//   @override
+//   var widget = Scaffold(
+//     appBar: AppBar(title: Text(base64Image.toString())),
+//     body: Column(
+//       children: [
+//         Image.memory(base64Decode(base64Image)),
+//       ],
+//     ),
+//     floatingActionButton: FloatingActionButton(onPressed: () async {
+//       try {
+//         Rilievo? rilievo = await DBHelper.instance.getRilievo(id!);
+//
+//         id != null
+//             ? await DBHelper.instance.update(
+//                 Rilievo(
+//                   id: id,
+//                   nome: rilievo?.nome,
+//                   cognome: rilievo?.cognome,
+//                   blob: base64Image,
+//                 ),
+//               )
+//             : await DBHelper.instance.update(
+//                 Rilievo(
+//                   id: id,
+//                   nome: rilievo?.nome,
+//                   cognome: rilievo?.cognome,
+//                   blob: base64Image,
+//                 ),
+//               );
+//         Navigator.of(context).pop();
+//       } catch (e) {
+//         print(e);
+//       }
+//     }),
+//   );
+//   showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return widget;
+//       });
+//   //restituisce la stringa base64 dell'immagine
+// }
 
 class DisplayPictureScreen extends StatelessWidget {
   final String base64Image;
@@ -318,25 +326,26 @@ class DisplayPictureScreen extends StatelessWidget {
             : const Icon(Icons.save, color: Colors.white),
         onPressed: () async {
           try {
-            Operaio? operaio = await DBHelper.instance.getOperaio(id!);
+            Rilievo? rilievo = await DBHelper.instance.getRilievo(id!);
 
             id != null
                 ? await DBHelper.instance.update(
-                    Operaio(
+                    Rilievo(
                       id: id,
-                      nome: operaio?.nome,
-                      cognome: operaio?.cognome,
+                      nome: rilievo?.nome,
+                      cognome: rilievo?.cognome,
                       blob: base64Image,
                     ),
                   )
                 : await DBHelper.instance.update(
-                    Operaio(
+                    Rilievo(
                       id: id,
-                      nome: operaio?.nome,
-                      cognome: operaio?.cognome,
+                      nome: rilievo?.nome,
+                      cognome: rilievo?.cognome,
                       blob: base64Image,
                     ),
                   );
+            Navigator.of(context).pop();
             Navigator.of(context).pop();
           } catch (e) {
             print(e);
@@ -365,48 +374,50 @@ class DisplayData extends StatelessWidget {
   final bool mounted;
   final int? selectedId;
 
-  final operai = DBHelper.instance.getOperai();
+  final rilievi = DBHelper.instance.getRilievi();
 
   //get selectedId => null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //floatingActionButtonAnimator: NoScalingAnimation(),
       appBar: AppBar(
         title: const Text('Visualizzazione dati'),
       ),
-      body: FutureBuilder<List<Operaio>>(
-          future: DBHelper.instance.getOperai(),
+      body: FutureBuilder<List<Rilievo>>(
+          future: DBHelper.instance.getRilievi(),
           builder:
-              (BuildContext context, AsyncSnapshot<List<Operaio>> snapshot) {
+              (BuildContext context, AsyncSnapshot<List<Rilievo>> snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: Text('Caricamento...'));
             }
             return snapshot.data!.isEmpty
-                ? const Center(child: Text('Nessun operaio in lista'))
-                : Column(
-                    children: snapshot.data!.map((operaio) {
-                      return Center(
-                        child: Card(
-                          color: Colors.white70,
-                          child: ListTile(
-                            title: Text(operaio.nome! + ' ' + operaio.cognome!),
-                            trailing: FloatingActionButton(
-                              mini: true,
-                              onPressed: () async {
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => Fotocamera(
-                                      initializeControllerFuture: _initializeControllerFuture,
-                                      mounted: mounted,
-                                      selectedId: operaio.id,
-                                      controller: _cameraController,
-                                    ),
+                ? const Center(child: Text('Lista vuota'))
+                : ListView(
+                    children: snapshot.data!.map((rilievo) {
+                      return Card(
+                        color: Colors.white70,
+                        child: ListTile(
+                          //contentPadding: const EdgeInsets.all(20.0),
+                          title: Text('${rilievo.nome!} ${rilievo.cognome!}'),
+                          trailing: ElevatedButton(
+                            // heroTag: null,
+                            // mini: true,
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => Fotocamera(
+                                    initializeControllerFuture:
+                                      _initializeControllerFuture,
+                                    mounted: mounted,
+                                    selectedId: rilievo.id,
+                                    controller: _cameraController,
                                   ),
-                                );
-                              },
-                              child: const Icon(Icons.add_a_photo),
-                            ),
+                                ),
+                              );
+                            },
+                            child: const Icon(Icons.add_a_photo),
                           ),
                         ),
                       );
@@ -481,3 +492,30 @@ void dialogAlertButton(
         return dialog;
       });
 }
+
+// //blocca l'animazione di un floating action button
+// class NoScalingAnimation extends FloatingActionButtonAnimator{
+//   late double _x;
+//   late double _y;
+//
+//   @override
+//   Offset getOffset({
+//         required Offset begin,
+//         required Offset end,
+//         required double progress
+//       }) {
+//     _x = begin.dx +(end.dx - begin.dx)*progress ;
+//     _y = begin.dy +(end.dy - begin.dy)*progress;
+//     return Offset(_x,_y);
+//   }
+//
+//   @override
+//   Animation<double> getRotationAnimation({required Animation<double> parent}) {
+//     return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
+//   }
+//
+//   @override
+//   Animation<double> getScaleAnimation({required Animation<double> parent}) {
+//     return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
+//   }
+// }

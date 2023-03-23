@@ -207,10 +207,10 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                     ),
                   ],
                 ),
-                FutureBuilder<List<Operaio>>(
-                    future: DBHelper.instance.getOperai(),
+                FutureBuilder<List<Rilievo>>(
+                    future: DBHelper.instance.getRilievi(),
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<Operaio>> snapshot) {
+                        AsyncSnapshot<List<Rilievo>> snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: Text('Caricamento...'));
                       }
@@ -290,14 +290,14 @@ class _InserimentoTestoState extends State<InserimentoTesto> {
                   onPressed: () async {
                     selectedId != null
                         ? await DBHelper.instance.update(
-                      Operaio(
+                      Rilievo(
                           id: selectedId,
                           nome: textController[0].text,
                           cognome: textController[1].text,
                       ),
                     )
                         : await DBHelper.instance.add(
-                            Operaio(
+                            Rilievo(
                                 nome: textController[0].text,
                                 cognome: textController[1].text),
                           );
@@ -341,13 +341,13 @@ class DisplayPictureScreen extends StatelessWidget {
         onPressed: () async {
           id != null
               ? await DBHelper.instance.update(
-            Operaio(
+            Rilievo(
               id: id,
               blob: base64Image,
             ),
           )
               : await DBHelper.instance.add(
-            Operaio(
+            Rilievo(
               id: id,
               blob: base64Image,
             ),
@@ -361,7 +361,7 @@ class DisplayPictureScreen extends StatelessWidget {
 class DisplayData extends StatelessWidget {
   DisplayData({super.key});
 
-  final operai = DBHelper.instance.getOperai();
+  final operai = DBHelper.instance.getRilievi();
 
   get selectedId => null;
 
@@ -372,10 +372,10 @@ class DisplayData extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Visualizzazione dati'),
       ),
-      body: FutureBuilder<List<Operaio>>(
-          future: DBHelper.instance.getOperai(),
+      body: FutureBuilder<List<Rilievo>>(
+          future: DBHelper.instance.getRilievi(),
           builder: (BuildContext context,
-              AsyncSnapshot<List<Operaio>> snapshot) {
+              AsyncSnapshot<List<Rilievo>> snapshot) {
             if (!snapshot.hasData) {
               return const Center(child: Text('Caricamento...'));
             }

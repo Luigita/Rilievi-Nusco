@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
-class Operaio {
+class Rilievo {
   @required
   final int? id;
   //@required
@@ -17,9 +17,9 @@ class Operaio {
   String? blob;
 
   //costrutore
-  Operaio({this.id, this.nome, this.cognome, this.blob});
+  Rilievo({this.id, this.nome, this.cognome, this.blob});
 
-  factory Operaio.fromMap(Map<String, dynamic> json) => Operaio(
+  factory Rilievo.fromMap(Map<String, dynamic> json) => Rilievo(
     id: json['id'],
     nome: json['name'],
     cognome: json['cognome'],
@@ -35,15 +35,15 @@ class Operaio {
     };
   }
 
-  Operaio.fromMapObject(Map<String, dynamic> mappaOperai)
-      : id = mappaOperai['id'],
-        nome = mappaOperai['name'],
-        cognome = mappaOperai['cognome'],
-        blob = mappaOperai['foto'];
+  Rilievo.fromMapObject(Map<String, dynamic> mappaRilievo)
+      : id = mappaRilievo['id'],
+        nome = mappaRilievo['name'],
+        cognome = mappaRilievo['cognome'],
+        blob = mappaRilievo['foto'];
 
   @override
   String toString(){
-    return 'Operaio{id: $id, name: $nome, cognome: $cognome, foto: $blob}';
+    return 'Rilievo{id: $id, name: $nome, cognome: $cognome, foto: $blob}';
   }
 }
 
@@ -54,9 +54,11 @@ class DBHelper{
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
 
+  String tableName = 'rilievi';
+
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'operai.db');
+    String path = join(documentsDirectory.path, 'rilievi.db');
     return await openDatabase(
       path,
       version: 1,
@@ -66,7 +68,7 @@ class DBHelper{
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE operai(
+      CREATE TABLE rilievi(
         id INTEGER PRIMARY KEY,
         name TEXT,
         cognome TEXT,
@@ -75,46 +77,46 @@ class DBHelper{
     ''');
   }
 
-  Future<List<Operaio>> getOperai() async {
+  Future<List<Rilievo>> getRilievi() async {
     Database db = await instance.database;
-    var operai = await db.query('operai', orderBy: 'name');
-    List<Operaio> listaOperai = operai.isNotEmpty
-      ? operai.map((c) => Operaio.fromMap(c)).toList()
+    var rilievi = await db.query(tableName, orderBy: 'name');
+    List<Rilievo> listaRilievi = rilievi.isNotEmpty
+      ? rilievi.map((c) => Rilievo.fromMap(c)).toList()
         : [];
-    return listaOperai;
+    return listaRilievi;
   }
 
-  Future<Operaio?> getOperaio(int id) async {
+  Future<Rilievo?> getRilievo(int id) async {
     Database db = await instance.database;
-    var result = await db.query('operai', where: 'id = ?', whereArgs: [id]);
+    var result = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     if (result.isNotEmpty) {
-      return Operaio.fromMap(result.first);
+      return Rilievo.fromMap(result.first);
     }
     return null;
   }
 
-  Future<int> add(Operaio operaio) async {
+  Future<int> add(Rilievo rilievo) async {
     Database db = await instance.database;
-    return await db.insert('operai', operaio.toMap());
+    return await db.insert(tableName, rilievo.toMap());
   }
 
   Future<int> remove(int id) async {
     Database db = await instance.database;
-    return await db.delete('operai', where: 'id = ?', whereArgs: [id]);
+    return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> update(Operaio operaio) async {
+  Future<int> update(Rilievo rilievo) async {
     Database db = await instance.database;
-    return await db.update('operai', operaio.toMap(), where: 'id = ?', whereArgs: [operaio.id]);
+    return await db.update(tableName, rilievo.toMap(), where: 'id = ?', whereArgs: [rilievo.id]);
   }
 
   Future<int> deleteAll() async {
     Database db = await instance.database;
-    return await db.delete('operai');
+    return await db.delete(tableName);
   }
 
   // Future<int> addPhoto() async {
   //   Database db = await instance.database;
-  //   return await db.update('operai', );
+  //   return await db.update(tableName, );
   // }
 }
