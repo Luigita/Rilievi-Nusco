@@ -1,25 +1,32 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:signature/signature.dart';
 import 'dart:typed_data';
 
+import 'mio_database.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+
+class Disegno extends StatefulWidget {
+  final int? id;
+
+  const Disegno(
+      {super.key, required this.id});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Disegno> createState() => _DisegnoState();
 }
 
-class _HomeState extends State<Home> {
+class _DisegnoState extends State<Disegno> {
   // initialize the signature controller
   final SignatureController _controller = SignatureController(
     penStrokeWidth: 1,
     penColor: Colors.red,
-    exportBackgroundColor: Colors.blue,
+    exportBackgroundColor: Colors.white,
     exportPenColor: Colors.black,
     onDrawStart: () => log('onDrawStart called!'),
     onDrawEnd: () => log('onDrawEnd called!'),
@@ -28,7 +35,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() => log('Value changed'));
+    //_controller.addListener(() => log('Value changed'));
   }
 
   @override
@@ -55,6 +62,37 @@ class _HomeState extends State<Home> {
       return;
     }
 
+    //final bytes = await File(data.toString()).readAsBytes();
+
+    final base64Disegno= base64Encode(data);
+
+    try {
+      Rilievo? rilievo = await DBHelper.instance.getRilievo(widget.id!);
+
+      widget.id != null
+          ? await DBHelper.instance.update(
+        Rilievo(
+          id: widget.id,
+          nome: rilievo?.nome,
+          cognome: rilievo?.cognome,
+          blob: rilievo?.blob,
+          disegno: base64Disegno,
+        ),
+      )
+          : await DBHelper.instance.update(
+        Rilievo(
+          id: widget.id,
+          nome: rilievo?.nome,
+          cognome: rilievo?.cognome,
+          blob: rilievo?.blob,
+          disegno: base64Disegno,
+        ),
+      );
+    } catch (e) {
+      print(e);
+      // TODO
+    }
+
     if (!mounted) return;
 
     await push(
@@ -65,7 +103,7 @@ class _HomeState extends State<Home> {
         ),
         body: Center(
           child: Container(
-            color: Colors.grey[300],
+            color: Colors.grey[400],
             child: Image.memory(data),
           ),
         ),
@@ -73,36 +111,65 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> exportSVG(BuildContext context) async {
-    if (_controller.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          key: Key('snackbarSVG'),
-          content: Text('No content'),
-        ),
-      );
-      return;
-    }
-
-    final SvgPicture data = _controller.toSVG()!;
-
-    if (!mounted) return;
-
-    await push(
-      context,
-      Scaffold(
-        appBar: AppBar(
-          title: const Text('SVG Image'),
-        ),
-        body: Center(
-          child: Container(
-            color: Colors.grey[300],
-            child: data,
-          ),
-        ),
-      ),
-    );
-  }
+  // Future<void> exportSVG(BuildContext context) async {
+  //   if (_controller.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         key: Key('snackbarSVG'),
+  //         content: Text('No content'),
+  //       ),
+  //     );
+  //     return;
+  //   }
+  //
+  //   final SvgPicture data = _controller.toSVG()!;
+  //   //
+  //   // final bytes = await File(data.toString()).readAsBytes();
+  //   //
+  //   // final base64Disegno= base64Encode(data);
+  //
+  //   try {
+  //     Rilievo? rilievo = await DBHelper.instance.getRilievo(widget.id!);
+  //
+  //     widget.id != null
+  //         ? await DBHelper.instance.update(
+  //       Rilievo(
+  //         id: widget.id,
+  //         nome: rilievo?.nome,
+  //         cognome: rilievo?.cognome,
+  //         disegno: base64Disegno,
+  //       ),
+  //     )
+  //         : await DBHelper.instance.update(
+  //       Rilievo(
+  //         id: widget.id,
+  //         nome: rilievo?.nome,
+  //         cognome: rilievo?.cognome,
+  //         disegno: base64Disegno,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     print(e);
+  //     // TODO
+  //   }
+  //
+  //   if (!mounted) return;
+  //
+  //   await push(
+  //     context,
+  //     Scaffold(
+  //       appBar: AppBar(
+  //         title: const Text('SVG Image'),
+  //       ),
+  //       body: Center(
+  //         child: Container(
+  //           color: Colors.grey[300],
+  //           child: data,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -112,27 +179,27 @@ class _HomeState extends State<Home> {
       ),
       body: ListView(
         children: <Widget>[
-          const SizedBox(
-            height: 300,
-            child: Center(
-              child: Text('Big container to test scrolling issues'),
-            ),
-          ),
+          // const SizedBox(
+          //   height: 300,
+          //   child: Center(
+          //     child: Text('Big container to test scrolling issues'),
+          //   ),
+          // ),
           //SIGNATURE CANVAS
           Signature(
             key: const Key('signature'),
             controller: _controller,
-            height: 300,
+            //height: 300,
             backgroundColor: Colors.grey[300]!,
           ),
           //OK AND CLEAR BUTTONS
 
-          const SizedBox(
-            height: 300,
-            child: Center(
-              child: Text('Big container to test scrolling issues'),
-            ),
-          ),
+          // const SizedBox(
+          //   height: 300,
+          //   child: Center(
+          //     child: Text('Big container to test scrolling issues'),
+          //   ),
+          // ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -145,18 +212,18 @@ class _HomeState extends State<Home> {
               //SHOW EXPORTED IMAGE IN NEW ROUTE
               IconButton(
                 key: const Key('exportPNG'),
-                icon: const Icon(Icons.image),
+                icon: const Icon(Icons.save),
                 color: Colors.blue,
                 onPressed: () => exportImage(context),
                 tooltip: 'Export Image',
               ),
-              IconButton(
-                key: const Key('exportSVG'),
-                icon: const Icon(Icons.share),
-                color: Colors.blue,
-                onPressed: () => exportSVG(context),
-                tooltip: 'Export SVG',
-              ),
+              // IconButton(
+              //   key: const Key('exportSVG'),
+              //   icon: const Icon(Icons.share),
+              //   color: Colors.blue,
+              //   onPressed: () => exportSVG(context),
+              //   tooltip: 'Export SVG',
+              // ),
               IconButton(
                 icon: const Icon(Icons.undo),
                 color: Colors.blue,

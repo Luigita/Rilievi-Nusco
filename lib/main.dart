@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:applicazione_prova/fotocamera.dart';
 import 'package:applicazione_prova/mio_database.dart';
@@ -67,16 +68,16 @@ class _InserimentoTestoState extends State<InserimentoTesto>
   List<TextEditingController> textController =
       List.generate(2, (int i) => TextEditingController());
 
-  //controller dell'area di firma (disegno)
-  final SignatureController _signatureController = SignatureController(
-    penStrokeWidth: 3,
-    penColor: Colors.red,
-    exportBackgroundColor: Colors.blue,
-  );
+  // //controller dell'area di firma (disegno)
+  // final SignatureController _signatureController = SignatureController(
+  //   penStrokeWidth: 3,
+  //   penColor: Colors.red,
+  //   exportBackgroundColor: Colors.blue,
+  // );
 
   @override
   void dispose() {
-    _signatureController.dispose();
+    // _signatureController.dispose();
     _cameraController?.dispose();
     super.dispose();
   }
@@ -195,18 +196,25 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                               }).toList(),
                             );
                     }),
-                Signature(
-                  controller: _signatureController,
-                  width: 300,
-                  height: 300,
-                  backgroundColor: Colors.lightBlueAccent,
-                )
+                // Signature(
+                //   controller: _signatureController,
+                //   width: 300,
+                //   height: 300,
+                //   backgroundColor: Colors.lightBlueAccent,
+                // )
               ],
             ),
           ),
           floatingActionButton: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              ///TODO: ESPORTAZIONE DATABASE
+              FloatingActionButton(
+                  onPressed: () {
+                    DBHelper.instance.getDatabasePath();
+                  }
+              ),
+
               GestureDetector(
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
@@ -335,6 +343,7 @@ class DisplayPictureScreen extends StatelessWidget {
                       nome: rilievo?.nome,
                       cognome: rilievo?.cognome,
                       blob: base64Image,
+                      disegno: rilievo?.disegno,
                     ),
                   )
                 : await DBHelper.instance.update(
@@ -343,6 +352,7 @@ class DisplayPictureScreen extends StatelessWidget {
                       nome: rilievo?.nome,
                       cognome: rilievo?.cognome,
                       blob: base64Image,
+                      disegno: rilievo?.disegno,
                     ),
                   );
             Navigator.of(context).pop();
@@ -401,23 +411,50 @@ class DisplayData extends StatelessWidget {
                         child: ListTile(
                           //contentPadding: const EdgeInsets.all(20.0),
                           title: Text('${rilievo.nome!} ${rilievo.cognome!}'),
-                          trailing: ElevatedButton(
-                            // heroTag: null,
-                            // mini: true,
-                            onPressed: () async {
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => Fotocamera(
-                                    initializeControllerFuture:
-                                      _initializeControllerFuture,
-                                    mounted: mounted,
-                                    selectedId: rilievo.id,
-                                    controller: _cameraController,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Icon(Icons.add_a_photo),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                // heroTag: null,
+                                // mini: true,
+                                onPressed: () async {
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => Disegno(id: rilievo.id)
+                                      //     Fotocamera(
+                                      //   initializeControllerFuture:
+                                      //     _initializeControllerFuture,
+                                      //   mounted: mounted,
+                                      //   selectedId: rilievo.id,
+                                      //   controller: _cameraController,
+                                      // ),
+                                    ),
+                                  );
+                                },
+                                child: const Icon(Icons.draw),
+                              ),
+                              const VerticalDivider(
+                                thickness: null,
+                              ),
+                              ElevatedButton(
+                                // heroTag: null,
+                                // mini: true,
+                                onPressed: () async {
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => Fotocamera(
+                                        initializeControllerFuture:
+                                          _initializeControllerFuture,
+                                        mounted: mounted,
+                                        selectedId: rilievo.id,
+                                        controller: _cameraController,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Icon(Icons.add_a_photo),
+                              ),
+                            ],
                           ),
                         ),
                       );

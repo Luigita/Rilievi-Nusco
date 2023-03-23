@@ -16,14 +16,17 @@ class Rilievo {
 
   String? blob;
 
+  String? disegno;
+
   //costrutore
-  Rilievo({this.id, this.nome, this.cognome, this.blob});
+  Rilievo({this.id, this.nome, this.cognome, this.blob, this.disegno});
 
   factory Rilievo.fromMap(Map<String, dynamic> json) => Rilievo(
     id: json['id'],
     nome: json['name'],
     cognome: json['cognome'],
     blob: json['foto'],
+    disegno: json['disegno'],
   );
 
   Map<String, dynamic> toMap(){
@@ -32,6 +35,7 @@ class Rilievo {
       'name': nome,
       'cognome': cognome,
       'foto': blob,
+      'disegno': disegno,
     };
   }
 
@@ -39,11 +43,13 @@ class Rilievo {
       : id = mappaRilievo['id'],
         nome = mappaRilievo['name'],
         cognome = mappaRilievo['cognome'],
-        blob = mappaRilievo['foto'];
+        blob = mappaRilievo['foto'],
+        disegno = mappaRilievo['disegno'];
 
   @override
   String toString(){
-    return 'Rilievo{id: $id, name: $nome, cognome: $cognome, foto: $blob}';
+    return
+      'Rilievo{id: $id, name: $nome, cognome: $cognome, foto: $blob, disegno: $disegno}';
   }
 }
 
@@ -72,9 +78,16 @@ class DBHelper{
         id INTEGER PRIMARY KEY,
         name TEXT,
         cognome TEXT,
-        foto TEXT
+        foto TEXT,
+        disegno TEXT
       )
     ''');
+  }
+
+  Future<String> getDatabasePath() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'rilievi.db');
+    return path;
   }
 
   Future<List<Rilievo>> getRilievi() async {
