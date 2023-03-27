@@ -24,7 +24,7 @@ class Disegno extends StatefulWidget {
 class _DisegnoState extends State<Disegno> {
   // initialize the signature controller
   final SignatureController _controller = SignatureController(
-    penStrokeWidth: 1,
+    penStrokeWidth: 2,
     penColor: Colors.red,
     exportBackgroundColor: Colors.white,
     exportPenColor: Colors.black,
@@ -50,7 +50,7 @@ class _DisegnoState extends State<Disegno> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           key: Key('snackbarPNG'),
-          content: Text('No content'),
+          content: Text('Nessun contenuto'),
         ),
       );
       return;
@@ -69,28 +69,18 @@ class _DisegnoState extends State<Disegno> {
     try {
       Rilievo? rilievo = await DBHelper.instance.getRilievo(widget.id!);
 
-      widget.id != null
-          ? await DBHelper.instance.update(
+      await DBHelper.instance.update(
         Rilievo(
           id: widget.id,
           nome: rilievo?.nome,
           cognome: rilievo?.cognome,
           blob: rilievo?.blob,
           disegno: base64Disegno,
-        ),
-      )
-          : await DBHelper.instance.update(
-        Rilievo(
-          id: widget.id,
-          nome: rilievo?.nome,
-          cognome: rilievo?.cognome,
-          blob: rilievo?.blob,
-          disegno: base64Disegno,
+          note: rilievo?.note,
         ),
       );
     } catch (e) {
       print(e);
-      // TODO
     }
 
     if (!mounted) return;
@@ -99,7 +89,7 @@ class _DisegnoState extends State<Disegno> {
       context,
       Scaffold(
         appBar: AppBar(
-          title: const Text('PNG Image'),
+          title: const Text('Anteprima'),
         ),
         body: Center(
           child: Container(
@@ -150,7 +140,6 @@ class _DisegnoState extends State<Disegno> {
   //     );
   //   } catch (e) {
   //     print(e);
-  //     // TODO
   //   }
   //
   //   if (!mounted) return;
@@ -175,7 +164,7 @@ class _DisegnoState extends State<Disegno> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Signature Demo'),
+        title: const Text('Disegno tecnico'),
       ),
       body: ListView(
         children: <Widget>[
@@ -214,8 +203,10 @@ class _DisegnoState extends State<Disegno> {
                 key: const Key('exportPNG'),
                 icon: const Icon(Icons.save),
                 color: Colors.blue,
-                onPressed: () => exportImage(context),
-                tooltip: 'Export Image',
+                onPressed: () => {
+                  exportImage(context),
+                },
+                tooltip: 'Save',
               ),
               // IconButton(
               //   key: const Key('exportSVG'),

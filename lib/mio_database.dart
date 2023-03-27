@@ -13,13 +13,13 @@ class Rilievo {
   String? nome;
   //@required
   String? cognome;
-
+  String? note;
   String? blob;
-
   String? disegno;
 
+
   //costrutore
-  Rilievo({this.id, this.nome, this.cognome, this.blob, this.disegno});
+  Rilievo({this.id, this.nome, this.cognome, this.blob, this.disegno, this.note});
 
   factory Rilievo.fromMap(Map<String, dynamic> json) => Rilievo(
     id: json['id'],
@@ -27,6 +27,7 @@ class Rilievo {
     cognome: json['cognome'],
     blob: json['foto'],
     disegno: json['disegno'],
+    note: json['note'],
   );
 
   Map<String, dynamic> toMap(){
@@ -36,6 +37,7 @@ class Rilievo {
       'cognome': cognome,
       'foto': blob,
       'disegno': disegno,
+      'note': note,
     };
   }
 
@@ -44,12 +46,13 @@ class Rilievo {
         nome = mappaRilievo['name'],
         cognome = mappaRilievo['cognome'],
         blob = mappaRilievo['foto'],
-        disegno = mappaRilievo['disegno'];
+        disegno = mappaRilievo['disegno'],
+        note = mappaRilievo['note'];
 
   @override
   String toString(){
     return
-      'Rilievo{id: $id, name: $nome, cognome: $cognome, foto: $blob, disegno: $disegno}';
+      'Rilievo{id: $id, name: $nome, cognome: $cognome, foto: $blob, disegno: $disegno, note: $note}';
   }
 }
 
@@ -58,11 +61,11 @@ class DBHelper{
   static final DBHelper instance = DBHelper._privateConstructor();
 
   static Database? _database;
-  Future<Database> get database async => _database ??= await _initDatabase();
+  Future<Database> get database async => _database ??= await initDatabase();
 
   String tableName = 'rilievi';
 
-  Future<Database> _initDatabase() async {
+  Future<Database> initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'rilievi.db');
     return await openDatabase(
@@ -78,6 +81,7 @@ class DBHelper{
         id INTEGER PRIMARY KEY,
         name TEXT,
         cognome TEXT,
+        note TEXT,
         foto TEXT,
         disegno TEXT
       )
@@ -126,6 +130,12 @@ class DBHelper{
   Future<int> deleteAll() async {
     Database db = await instance.database;
     return await db.delete(tableName);
+  }
+
+  Future<int?> tableIsEmpty() async {
+    Database db = await instance.database;
+    int? count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM rilievi'));
+    return(count);
   }
 
   // Future<int> addPhoto() async {

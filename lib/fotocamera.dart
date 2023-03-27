@@ -4,24 +4,63 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 
 import 'main.dart';
 
-class Fotocamera extends StatelessWidget {
+///TODO: FARE FOTOCAMERA UNO STATEFUL WIDGET E SPOSTARE initState(E FORSE PURE IL DISPOSE) DAL MAIN A QUA PER FAR AVVIARE LA FOTOCAMERA NON ALLA PRIMA SCHERMATA
+
+class Fotocamera extends StatefulWidget {
   const Fotocamera({
     super.key,
-    required Future<void> initializeControllerFuture,
+    required this.cameraDescription,
+    //required Future<void> initializeControllerFuture,
     required CameraController? controller,
     required this.mounted,
     required this.selectedId,
-  })  : _initializeControllerFuture = initializeControllerFuture,
-        _controller = controller;
+  });  //: //_initializeControllerFuture = initializeControllerFuture,
+        //_controller = controller;
 
-  final Future<void> _initializeControllerFuture;
-  final CameraController? _controller;
+  final CameraDescription cameraDescription;
+
   final bool mounted;
   final int? selectedId;
+
+  @override
+  State<Fotocamera> createState() => _FotocameraState();
+}
+
+class _FotocameraState extends State<Fotocamera> {
+
+  //CameraController? _cameraController;
+  late Future<void> _initializeControllerFuture;
+  CameraController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    _controller = CameraController(
+        widget.cameraDescription, ResolutionPreset.medium
+    );
+    _initializeControllerFuture = _controller!.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +69,7 @@ class Fotocamera extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: const BackButton(
-          color: Colors.white, // <-- SEE HERE
+          color: Colors.white,
         ),
       ),
       body: Column(
@@ -58,7 +97,7 @@ class Fotocamera extends StatelessWidget {
                 // where it was saved.
                 final image = await _controller?.takePicture();
 
-                if (!mounted) return;
+                if (!widget.mounted) return;
 
                 //SALVA L'IMMAGINE NELLA GALLERIA
                 GallerySaver.saveImage(image!.path, albumName: 'RILIEVI');
@@ -72,8 +111,8 @@ class Fotocamera extends StatelessWidget {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => DisplayPictureScreen(
-                      id: selectedId,
-                      // Pass the automatically generated path to
+                      id: widget.selectedId,
+                      // Pass the base64 string to
                       // the DisplayPictureScreen widget.
                       base64Image: base64Image,
                     ),

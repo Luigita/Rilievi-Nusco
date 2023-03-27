@@ -1,13 +1,14 @@
+import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
-import 'package:applicazione_prova/fotocamera.dart';
-import 'package:applicazione_prova/mio_database.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:signature/signature.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
 
+import 'mio_database.dart';
+import 'fotocamera.dart';
 import 'disegno.dart';
 
 Future main() async {
@@ -56,17 +57,16 @@ class InserimentoTesto extends StatefulWidget {
 }
 
 class _InserimentoTestoState extends State<InserimentoTesto>
-  with WidgetsBindingObserver {
-
+    with WidgetsBindingObserver {
   CameraController? _cameraController;
-  late Future<void> _initializeControllerFuture;
+  //late Future<void> _initializeControllerFuture;
 
   int? selectedId;
   //final textController = TextEditingController();
 
   //DA MODIFICARE PER FARE PIU DI DUE TEXTFIELD//
   List<TextEditingController> textController =
-      List.generate(2, (int i) => TextEditingController());
+      List.generate(3, (int i) => TextEditingController());
 
   // //controller dell'area di firma (disegno)
   // final SignatureController _signatureController = SignatureController(
@@ -75,21 +75,21 @@ class _InserimentoTestoState extends State<InserimentoTesto>
   //   exportBackgroundColor: Colors.blue,
   // );
 
-  @override
-  void dispose() {
-    // _signatureController.dispose();
-    _cameraController?.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   // _signatureController.dispose();
+  //   _cameraController?.dispose();
+  //   super.dispose();
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    _cameraController = CameraController(
-        widget.camera, ResolutionPreset.medium
-    );
-    _initializeControllerFuture = _cameraController!.initialize();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _cameraController = CameraController(
+  //       widget.camera, ResolutionPreset.medium
+  //   );
+  //   _initializeControllerFuture = _cameraController!.initialize();
+  // }
 
   // @override
   // void dispose() {
@@ -112,8 +112,9 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => DisplayData(
-                          initializeControllerFuture:
-                            _initializeControllerFuture,
+                          cameraDescription: widget.camera,
+                          // initializeControllerFuture:
+                          //   _initializeControllerFuture,
                           mounted: mounted,
                           cameraController: _cameraController,
                           selectedId: selectedId,
@@ -133,21 +134,16 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                 const Text('NOME'),
                 TextField(
                   controller: textController[0],
-                  // onSubmitted: (String stringa) async{
-                  //   await DBHelper.instance.add(
-                  //     Operaio(nome: stringa, cognome: 'cognome')
-                  //   );
-                  // },
                 ),
                 const Divider(),
                 const Text('COGNOME'),
                 TextField(
                   controller: textController[1],
-                  // onSubmitted: (String stringa) async{
-                  //   await DBHelper.instance.add(
-                  //     Operaio(nome: stringa, cognome: 'cognome')
-                  //   );
-                  // },
+                ),
+                const Divider(),
+                const Text('NOTE'),
+                TextField(
+                  controller: textController[2],
                 ),
                 const Divider(),
                 FutureBuilder<List<Rilievo>>(
@@ -168,8 +164,7 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                                         : Colors.white,
                                     child: ListTile(
                                       title: Text(
-                                          '${rilievo.nome!} ${rilievo.cognome!}'
-                                      ),
+                                          '${rilievo.nome!} ${rilievo.cognome!}'),
                                       onTap: () {
                                         setState(() {
                                           if (selectedId == null) {
@@ -177,10 +172,13 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                                                 rilievo.nome!;
                                             textController[1].text =
                                                 rilievo.cognome!;
+                                            textController[2].text =
+                                                rilievo.note!;
                                             selectedId = rilievo.id;
                                           } else {
                                             textController[0].text = '';
                                             textController[1].text = '';
+                                            textController[2].text = '';
                                             selectedId = null;
                                           }
                                         });
@@ -208,13 +206,6 @@ class _InserimentoTestoState extends State<InserimentoTesto>
           floatingActionButton: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ///TODO: ESPORTAZIONE DATABASE
-              FloatingActionButton(
-                  onPressed: () {
-                    DBHelper.instance.getDatabasePath();
-                  }
-              ),
-
               GestureDetector(
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
@@ -242,16 +233,20 @@ class _InserimentoTestoState extends State<InserimentoTesto>
                               id: selectedId,
                               nome: textController[0].text,
                               cognome: textController[1].text,
+                              note: textController[2].text,
                             ),
                           )
                         : await DBHelper.instance.add(
                             Rilievo(
                                 nome: textController[0].text,
-                                cognome: textController[1].text),
+                                cognome: textController[1].text,
+                                note: textController[2].text,
+                            ),
                           );
                     setState(() {
                       textController[0].clear();
                       textController[1].clear();
+                      textController[2].clear();
                       selectedId = null;
                     });
                   },
@@ -335,32 +330,21 @@ class DisplayPictureScreen extends StatelessWidget {
         onPressed: () async {
           try {
             Rilievo? rilievo = await DBHelper.instance.getRilievo(id!);
-
-            id != null
-                ? await DBHelper.instance.update(
-                    Rilievo(
-                      id: id,
-                      nome: rilievo?.nome,
-                      cognome: rilievo?.cognome,
-                      blob: base64Image,
-                      disegno: rilievo?.disegno,
-                    ),
-                  )
-                : await DBHelper.instance.update(
-                    Rilievo(
-                      id: id,
-                      nome: rilievo?.nome,
-                      cognome: rilievo?.cognome,
-                      blob: base64Image,
-                      disegno: rilievo?.disegno,
-                    ),
-                  );
+            await DBHelper.instance.update(
+              Rilievo(
+                id: id,
+                nome: rilievo?.nome,
+                cognome: rilievo?.cognome,
+                note: rilievo?.note,
+                blob: base64Image,
+                disegno: rilievo?.disegno,
+              ),
+            );
             Navigator.of(context).pop();
             Navigator.of(context).pop();
           } catch (e) {
             print(e);
             Navigator.of(context).pop();
-            // TODO
           }
         },
       ),
@@ -368,26 +352,31 @@ class DisplayPictureScreen extends StatelessWidget {
   }
 }
 
-class DisplayData extends StatelessWidget {
-
-  DisplayData({
+class DisplayData extends StatefulWidget {
+  const DisplayData({
     super.key,
-    required Future<void> initializeControllerFuture,
+    required this.cameraDescription,
+    //required Future<void> initializeControllerFuture,
     required CameraController? cameraController,
     required this.mounted,
     required this.selectedId,
-  })  : _initializeControllerFuture = initializeControllerFuture,
+  }) : //_initializeControllerFuture = initializeControllerFuture,
         _cameraController = cameraController;
 
-  final Future<void> _initializeControllerFuture;
+  final CameraDescription cameraDescription;
+  //final Future<void> _initializeControllerFuture;
   final CameraController? _cameraController;
   final bool mounted;
   final int? selectedId;
 
+  @override
+  State<DisplayData> createState() => _DisplayDataState();
+}
+
+class _DisplayDataState extends State<DisplayData> {
   final rilievi = DBHelper.instance.getRilievi();
 
   //get selectedId => null;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,18 +409,22 @@ class DisplayData extends StatelessWidget {
                                 onPressed: () async {
                                   await Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) => Disegno(id: rilievo.id)
-                                      //     Fotocamera(
-                                      //   initializeControllerFuture:
-                                      //     _initializeControllerFuture,
-                                      //   mounted: mounted,
-                                      //   selectedId: rilievo.id,
-                                      //   controller: _cameraController,
-                                      // ),
-                                    ),
+                                        builder: (context) =>
+                                            Disegno(id: rilievo.id)
+                                        //     Fotocamera(
+                                        //   initializeControllerFuture:
+                                        //     _initializeControllerFuture,
+                                        //   mounted: mounted,
+                                        //   selectedId: rilievo.id,
+                                        //   controller: _cameraController,
+                                        // ),
+                                        ),
                                   );
+                                  setState(() {});
                                 },
-                                child: const Icon(Icons.draw),
+                                child: rilievo.disegno != null
+                                    ? const Icon(Icons.draw)
+                                    : const Icon(Icons.draw, color: Colors.red),
                               ),
                               const VerticalDivider(
                                 thickness: null,
@@ -443,16 +436,24 @@ class DisplayData extends StatelessWidget {
                                   await Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => Fotocamera(
-                                        initializeControllerFuture:
-                                          _initializeControllerFuture,
-                                        mounted: mounted,
+                                        cameraDescription:
+                                            widget.cameraDescription,
+                                        // initializeControllerFuture:
+                                        //   _initializeControllerFuture,
+                                        mounted: widget.mounted,
                                         selectedId: rilievo.id,
-                                        controller: _cameraController,
+                                        controller: widget._cameraController,
                                       ),
                                     ),
                                   );
+                                  setState(() {});
                                 },
-                                child: const Icon(Icons.add_a_photo),
+                                child: rilievo.blob != null
+                                    ? const Icon(Icons.add_a_photo)
+                                    : const Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.red,
+                                      ),
                               ),
                             ],
                           ),
@@ -460,6 +461,17 @@ class DisplayData extends StatelessWidget {
                       );
                     }).toList(),
                   );
+          }),
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.share),
+          onPressed: () async {
+            // Future<void> shareFile() async {
+            //   List<dynamic> docs = await DBHelper.instance.getDatabasePath();
+            //   if (docs == null || docs.isEmpty) return null;
+
+            Share.shareXFiles(
+              [XFile(await DBHelper.instance.getDatabasePath())],
+            );
           }),
     );
   }
@@ -507,8 +519,19 @@ void dialogAlertButton(
             child: const Icon(Icons.check),
             onPressed: () async {
               await DBHelper.instance.deleteAll();
+              // if (DBHelper.instance.tableIsEmpty() != null) {
+              //   await DBHelper.instance.deleteAll();
+              // }
+              // try {
+              //   File("${await DBHelper.instance.getDatabasePath()}-journal").delete();
+              //   await deleteDatabase(await DBHelper.instance.getDatabasePath());
+              //   DBHelper.instance;
+              // } catch (e) {
+              //   // TODO
+              // }
               textController[0].clear();
               textController[1].clear();
+              textController[2].clear();
               selectedId = null;
               Navigator.of(context).pop();
             },
@@ -529,7 +552,6 @@ void dialogAlertButton(
         return dialog;
       });
 }
-
 // //blocca l'animazione di un floating action button
 // class NoScalingAnimation extends FloatingActionButtonAnimator{
 //   late double _x;
