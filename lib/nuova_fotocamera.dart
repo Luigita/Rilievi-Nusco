@@ -1,38 +1,39 @@
-import 'dart:async';
 import 'dart:convert';
+// import 'dart:developer';
 import 'dart:io';
 
+// import 'package:applicazione_prova/main.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:flutter_svg/svg.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+// import 'package:signature/signature.dart';
+// import 'dart:typed_data';
 
-import 'main_vecchio.dart';
+//import 'mio_database.dart';
+import 'nuovo_database.dart';
 
-
-class Fotocamera extends StatefulWidget {
-
-  const Fotocamera({
+class Fotocamera extends StatefulWidget{
+  Fotocamera({
     super.key,
     required this.cameraDescription,
-    //required Future<void> initializeControllerFuture,
-    required CameraController? controller,
+    //required CameraController? controller,
     required this.mounted,
     required this.selectedId,
-  });  //: //_initializeControllerFuture = initializeControllerFuture,
-        //_controller = controller;
+    required this.tipoConfigurazione,
+  });
 
   final CameraDescription cameraDescription;
-
   final bool mounted;
   final int? selectedId;
+  final String tipoConfigurazione;
 
   @override
   State<Fotocamera> createState() => _FotocameraState();
 }
 
 class _FotocameraState extends State<Fotocamera> {
-
   //CameraController? _cameraController;
   late Future<void> _initializeControllerFuture;
   CameraController? _controller;
@@ -44,9 +45,8 @@ class _FotocameraState extends State<Fotocamera> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    _controller = CameraController(
-        widget.cameraDescription, ResolutionPreset.medium
-    );
+    _controller =
+        CameraController(widget.cameraDescription, ResolutionPreset.max);
     _initializeControllerFuture = _controller!.initialize();
   }
 
@@ -111,6 +111,7 @@ class _FotocameraState extends State<Fotocamera> {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => DisplayPictureScreen(
+                      tipoConfigurazione: widget.tipoConfigurazione,
                       id: widget.selectedId,
                       // Pass the base64 string to
                       // the DisplayPictureScreen widget.
@@ -126,6 +127,68 @@ class _FotocameraState extends State<Fotocamera> {
             child: const Icon(Icons.camera_alt),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DisplayPictureScreen extends StatelessWidget {
+  final String base64Image;
+  final int? id;
+  final String tipoConfigurazione;
+
+  const DisplayPictureScreen(
+      {super.key,
+      required this.base64Image,
+      required this.id,
+      required this.tipoConfigurazione});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(base64Image.toString())),
+      // The image is stored as a file on the device. Use the `Image.file`
+      // constructor with the given path to display the image.
+      body: Column(
+        children: [
+          //Text(imagePath.toString()),
+          Image.memory(base64Decode(base64Image)),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: id == null
+            ? const Icon(Icons.save, color: Colors.red)
+            : const Icon(Icons.save, color: Colors.white),
+        onPressed: () async {
+          try {
+            Configurazione? configurazione = await DBHelper.instance
+                .getConfigurazione(id!, tipoConfigurazione);
+            await DBHelper.instance.updateConfigurazione(
+                Configurazione(
+                  id: id,
+                  riferimento: configurazione?.riferimento,
+                  quantita: configurazione?.quantita,
+                  larghezza: configurazione?.larghezza,
+                  altezza: configurazione?.altezza,
+                  tipo: configurazione?.tipo,
+                  dxsx: configurazione?.dxsx,
+                  vetro: configurazione?.vetro,
+                  telaio: configurazione?.telaio,
+                  larghezzaLuce: configurazione?.larghezzaLuce,
+                  altezzaLuce: configurazione?.altezzaLuce,
+                  note: configurazione?.note,
+                  blob: base64Image,
+                  disegno: configurazione?.disegno,
+                  idParente: configurazione?.idParente,
+                ),
+                tipoConfigurazione);
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          } catch (e) {
+            print(e);
+            Navigator.of(context).pop();
+          }
+        },
       ),
     );
   }

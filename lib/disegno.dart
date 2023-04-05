@@ -3,19 +3,21 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:gallery_saver/gallery_saver.dart';
 import 'package:signature/signature.dart';
 import 'dart:typed_data';
 
-import 'mio_database.dart';
+//import 'mio_database.dart';
+import 'nuovo_database.dart';
 
 
 class Disegno extends StatefulWidget {
   final int? id;
+  final String tipoConfigurazione;
 
   const Disegno(
-      {super.key, required this.id});
+      {super.key, required this.id, required this.tipoConfigurazione});
 
   @override
   State<Disegno> createState() => _DisegnoState();
@@ -67,17 +69,27 @@ class _DisegnoState extends State<Disegno> {
     final base64Disegno= base64Encode(data);
 
     try {
-      Rilievo? rilievo = await DBHelper.instance.getRilievo(widget.id!);
+      Configurazione? configurazione = await DBHelper.instance.getConfigurazione(widget.id!, widget.tipoConfigurazione);
 
-      await DBHelper.instance.update(
-        Rilievo(
+      await DBHelper.instance.updateConfigurazione(
+        Configurazione(
           id: widget.id,
-          nome: rilievo?.nome,
-          cognome: rilievo?.cognome,
-          blob: rilievo?.blob,
+          riferimento: configurazione?.riferimento,
+          quantita: configurazione?.quantita,
+          larghezza: configurazione?.larghezza,
+          altezza: configurazione?.altezza,
+          tipo: configurazione?.tipo,
+          dxsx: configurazione?.dxsx,
+          vetro: configurazione?.vetro,
+          telaio: configurazione?.telaio,
+          larghezzaLuce: configurazione?.larghezzaLuce,
+          altezzaLuce: configurazione?.altezzaLuce,
+          blob: configurazione?.blob,
           disegno: base64Disegno,
-          note: rilievo?.note,
+          note: configurazione?.note,
+          idParente: configurazione?.idParente,
         ),
+        widget.tipoConfigurazione
       );
     } catch (e) {
       print(e);

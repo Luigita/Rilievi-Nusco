@@ -28,6 +28,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  sqflite_common_porter:
+    git:
+      url: https://github.com/tekartik/sqflite_more
+      ref: dart2_3
+      path: sqflite_common_porter
   flutter:
     sdk: flutter
   camera:
