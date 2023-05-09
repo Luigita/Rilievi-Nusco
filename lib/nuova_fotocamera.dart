@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_svg/svg.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+
 // import 'package:signature/signature.dart';
 // import 'dart:typed_data';
 
@@ -46,7 +47,7 @@ class _FotocameraState extends State<Fotocamera> {
       DeviceOrientation.portraitDown,
     ]);
     _controller =
-        CameraController(widget.cameraDescription, ResolutionPreset.max);
+        CameraController(widget.cameraDescription, ResolutionPreset.medium);
     _initializeControllerFuture = _controller!.initialize();
   }
 
@@ -72,6 +73,48 @@ class _FotocameraState extends State<Fotocamera> {
           color: Colors.white,
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        // Provide an onPressed callback.
+        onPressed: () async {
+          // Take the Picture in a try/catch block. If anything goes wrong,
+          // catch the error.
+          try {
+            // Ensure that the camera is initialized.
+            await _initializeControllerFuture;
+
+            // Attempt to take a picture and get the file `image`
+            // where it was saved.
+            final image = await _controller?.takePicture();
+
+            if (!widget.mounted) return;
+
+            ///SALVA L'IMMAGINE NELLA GALLERIA
+            GallerySaver.saveImage(image!.path, albumName: 'RILIEVI');
+
+            final bytes = await File(image.path).readAsBytes();
+
+            final base64Image = base64Encode(bytes);
+
+            //displayPicture(context, base64Image, selectedId);
+            // If the picture was taken, display it on a new screen.
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DisplayPictureScreen(
+                  tipoConfigurazione: widget.tipoConfigurazione,
+                  id: widget.selectedId,
+                  // Pass the base64 string to
+                  // the DisplayPictureScreen widget.
+                  base64Image: base64Image,
+                ),
+              ),
+            );
+          } catch (e) {
+            // If an error occurs, log the error to the console.
+            print(e);
+          }
+        },
+        child: const Icon(Icons.camera_alt),
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -84,48 +127,6 @@ class _FotocameraState extends State<Fotocamera> {
                   return const Center(child: CircularProgressIndicator());
                 }
               }),
-          FloatingActionButton(
-            // Provide an onPressed callback.
-            onPressed: () async {
-              // Take the Picture in a try/catch block. If anything goes wrong,
-              // catch the error.
-              try {
-                // Ensure that the camera is initialized.
-                await _initializeControllerFuture;
-
-                // Attempt to take a picture and get the file `image`
-                // where it was saved.
-                final image = await _controller?.takePicture();
-
-                if (!widget.mounted) return;
-
-                //SALVA L'IMMAGINE NELLA GALLERIA
-                GallerySaver.saveImage(image!.path, albumName: 'RILIEVI');
-
-                final bytes = await File(image.path).readAsBytes();
-
-                final base64Image = base64Encode(bytes);
-
-                //displayPicture(context, base64Image, selectedId);
-                // If the picture was taken, display it on a new screen.
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => DisplayPictureScreen(
-                      tipoConfigurazione: widget.tipoConfigurazione,
-                      id: widget.selectedId,
-                      // Pass the base64 string to
-                      // the DisplayPictureScreen widget.
-                      base64Image: base64Image,
-                    ),
-                  ),
-                );
-              } catch (e) {
-                // If an error occurs, log the error to the console.
-                print(e);
-              }
-            },
-            child: const Icon(Icons.camera_alt),
-          ),
         ],
       ),
     );
@@ -146,7 +147,7 @@ class DisplayPictureScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(base64Image.toString())),
+      appBar: AppBar(title: const Text("Anteprima")),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Column(
@@ -163,23 +164,23 @@ class DisplayPictureScreen extends StatelessWidget {
           try {
             Configurazione? configurazione = await DBHelper.instance
                 .getConfigurazione(id!, tipoConfigurazione);
-            await DBHelper.instance.updateConfigurazione(
+            DBHelper.instance.updateConfigurazione(
                 Configurazione(
                   id: id,
-                  riferimento: configurazione?.riferimento,
-                  quantita: configurazione?.quantita,
-                  larghezza: configurazione?.larghezza,
-                  altezza: configurazione?.altezza,
-                  tipo: configurazione?.tipo,
-                  dxsx: configurazione?.dxsx,
-                  vetro: configurazione?.vetro,
-                  telaio: configurazione?.telaio,
-                  larghezzaLuce: configurazione?.larghezzaLuce,
-                  altezzaLuce: configurazione?.altezzaLuce,
-                  note: configurazione?.note,
+                  riferimento: configurazione.riferimento,
+                  quantita: configurazione.quantita,
+                  larghezza: configurazione.larghezza,
+                  altezza: configurazione.altezza,
+                  tipo: configurazione.tipo,
+                  dxsx: configurazione.dxsx,
+                  vetro: configurazione.vetro,
+                  telaio: configurazione.telaio,
+                  larghezzaLuce: configurazione.larghezzaLuce,
+                  altezzaLuce: configurazione.altezzaLuce,
+                  note: configurazione.note,
                   blob: base64Image,
-                  disegno: configurazione?.disegno,
-                  idParente: configurazione?.idParente,
+                  disegno: configurazione.disegno,
+                  idParente: configurazione.idParente,
                 ),
                 tipoConfigurazione);
             Navigator.of(context).pop();

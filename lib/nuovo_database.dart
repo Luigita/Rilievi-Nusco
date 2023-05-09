@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
+//import 'package:sqflite_common_porter/sqflite_porter.dart';
+import 'utils_csv.dart';
 
 class RilievoTapparella {
   @required
@@ -17,8 +20,8 @@ class RilievoTapparella {
   String? colorazioneEst;
   String? listelliInt;
   String? listelliEst;
-  double? larghezzaInfissi;
-  double? altezzaInfissi;
+  String? larghezzaInfissi;
+  String? altezzaInfissi;
   String? misureLuce;
   String? tipoTapparella;
   String? coloreTapparella;
@@ -43,20 +46,20 @@ class RilievoTapparella {
   factory RilievoTapparella.fromMap(Map<String, dynamic> json) =>
       RilievoTapparella(
         id: json['id'],
-        cliente: json['cliente'],
-        cantiere: json['cantiere'],
-        data: json['data'],
-        tipologiaInfisso: json['tipologiaInfisso'],
-        guide: json['guide'],
-        colorazioneInt: json['colorazioneInt'],
-        colorazioneEst: json['colorazioneEst'],
-        listelliInt: json['listelliInt'],
-        listelliEst: json['listelliEst'],
+        cliente: json['cliente'].toString(),
+        cantiere: json['cantiere'].toString(),
+        data: json['data'].toString(),
+        tipologiaInfisso: json['tipologiaInfisso'].toString(),
+        guide: json['guide'].toString(),
+        colorazioneInt: json['colorazioneInt'].toString(),
+        colorazioneEst: json['colorazioneEst'].toString(),
+        listelliInt: json['listelliInt'].toString(),
+        listelliEst: json['listelliEst'].toString(),
         larghezzaInfissi: json['larghezzaInfissi'],
         altezzaInfissi: json['altezzaInfissi'],
-        misureLuce: json['misureLuce'],
-        tipoTapparella: json['tipoTapparella'],
-        coloreTapparella: json['coloreTapparella'],
+        misureLuce: json['misureLuce'].toString(),
+        tipoTapparella: json['tipoTapparella'].toString(),
+        coloreTapparella: json['coloreTapparella'].toString(),
       );
 
   Map<String, dynamic> toMap() {
@@ -127,14 +130,14 @@ class RilievoPersiana {
 
   factory RilievoPersiana.fromMap(Map<String, dynamic> json) => RilievoPersiana(
         id: json['id'],
-        cliente: json['cliente'],
-        destinazione: json['destinazione'],
-        data: json['data'],
-        modelloPorta: json['modelloPorta'],
-        modelloManiglia: json['modelloManiglia'],
-        finituraInterna: json['finituraInterna'],
-        commerciale: json['commerciale'],
-        ferramenta: json['ferramenta'],
+        cliente: json['cliente'].toString(),
+        destinazione: json['destinazione'].toString(),
+        data: json['data'].toString(),
+        modelloPorta: json['modelloPorta'].toString(),
+        modelloManiglia: json['modelloManiglia'].toString(),
+        finituraInterna: json['finituraInterna'].toString(),
+        commerciale: json['commerciale'].toString(),
+        ferramenta: json['ferramenta'].toString(),
       );
 
   Map<String, dynamic> toMap() {
@@ -181,6 +184,10 @@ class Configurazione {
   String? telaio;
   double? larghezzaLuce;
   double? altezzaLuce;
+  double? larghezzaCassonetto = 0;
+  double? altezzaCassonetto = 0;
+  double? spessoreCassonetto = 0;
+  double? profonditaCielino = 0;
   String? note;
   String? blob;
   String? disegno;
@@ -198,6 +205,10 @@ class Configurazione {
     this.telaio,
     this.larghezzaLuce,
     this.altezzaLuce,
+    this.larghezzaCassonetto,
+    this.altezzaCassonetto,
+    this.spessoreCassonetto,
+    this.profonditaCielino,
     this.blob,
     this.disegno,
     this.note,
@@ -206,17 +217,21 @@ class Configurazione {
 
   factory Configurazione.fromMap(Map<String, dynamic> json) => Configurazione(
       id: json['id'],
-      riferimento: json['riferimento'],
+      riferimento: json['riferimento'].toString(),
       quantita: json['quantita'],
       larghezza: json['larghezza'],
       altezza: json['altezza'],
-      tipo: json['tipo'],
-      dxsx: json['dxsx'],
-      vetro: json['vetro'],
-      telaio: json['telaio'],
+      tipo: json['tipo'].toString(),
+      dxsx: json['dxsx'].toString(),
+      vetro: json['vetro'].toString(),
+      telaio: json['telaio'].toString(),
       larghezzaLuce: json['larghezzaLuce'],
       altezzaLuce: json['altezzaLuce'],
-      note: json['note'],
+      larghezzaCassonetto: json['larghezzaCassonetto'],
+      altezzaCassonetto: json['altezzaCassonetto'],
+      spessoreCassonetto: json['spessoreCassonetto'],
+      profonditaCielino: json['profonditaCielino'],
+      note: json['note'].toString(),
       blob: json['blob'],
       disegno: json['disegno'],
       idParente: json['idParente']);
@@ -234,6 +249,10 @@ class Configurazione {
       'telaio': telaio,
       'larghezzaLuce': larghezzaLuce,
       'altezzaLuce': altezzaLuce,
+      'larghezzaCassonetto': larghezzaCassonetto,
+      'altezzaCassonetto': altezzaCassonetto,
+      'spessoreCassonetto': spessoreCassonetto,
+      'profonditaCielino': profonditaCielino,
       'note': note,
       'blob': blob,
       'disegno': disegno,
@@ -253,6 +272,10 @@ class Configurazione {
         telaio = mappaConfigurazione['telaio'],
         larghezzaLuce = mappaConfigurazione['larghezzaLuce'],
         altezzaLuce = mappaConfigurazione['altezzaLuce'],
+        larghezzaCassonetto = mappaConfigurazione['larghezzaCassonetto'],
+        altezzaCassonetto = mappaConfigurazione['altezzaCassonetto'],
+        spessoreCassonetto = mappaConfigurazione['spessoreCassonetto'],
+        profonditaCielino = mappaConfigurazione['profonditaCielino'],
         note = mappaConfigurazione['note'],
         blob = mappaConfigurazione['blob'],
         disegno = mappaConfigurazione['disegno'],
@@ -260,7 +283,25 @@ class Configurazione {
 
   @override
   String toString() {
-    return 'ConfigurazioneInfissi {id: $id, riferimento: $riferimento, quantita: $quantita, larghezza: $larghezza, altezza: $altezza, tipo: $tipo, dxsx: $dxsx, vetro: $vetro, telaio: $telaio, larghezzaLuce: $larghezzaLuce, altezzaLuce: $altezzaLuce, note: $note, blob: $blob, disegno: $disegno, idParente: $idParente}';
+    return 'Configurazione Infissi {id: $id, riferimento: $riferimento, quantita: $quantita, larghezza: $larghezza, altezza: $altezza, tipo: $tipo, dxsx: $dxsx, vetro: $vetro, telaio: $telaio, larghezzaLuce: $larghezzaLuce, altezzaLuce: $altezzaLuce, larghezzaCassonetto: $larghezzaCassonetto, altezzaCassonetto: $altezzaCassonetto, spessoreCassonetto: $spessoreCassonetto, profonditaCielino: $profonditaCielino, note: $note, blob: $blob, disegno: $disegno, idParente: $idParente}';
+  }
+
+  List<String> toStringFormatted() {
+    return [("Riferimento: $riferimento \n"),
+        ("Quantita: $quantita \n"),
+        ("Larghezza: $larghezza \n"),
+        ("Altezza: $altezza \n"),
+        ("Tipo: $tipo \n"),
+        ("Dxsx: $dxsx \n"),
+        ("Vetro: $vetro \n"),
+        ("Telaio: $telaio \n"),
+        ("Larghezza luce: $larghezzaLuce \n"),
+        ("Altezza luce: $altezzaLuce \n"),
+        ("Larghezza cassonetto: $larghezzaCassonetto \n"),
+        ("Altezza cassonetto: $altezzaCassonetto \n"),
+        ("Spessore cassonetto: $spessoreCassonetto \n"),
+        ("Profondita cielino: $profonditaCielino \n"),
+        ("Note: $note")];
   }
 }
 
@@ -296,8 +337,8 @@ class DBHelper {
         colorazioneEst STRING,
         listelliInt STRING,
         listelliEst STRING,
-        larghezzaInfissi REAL,
-        altezzaInfissi REAL,
+        larghezzaInfissi STRING,
+        altezzaInfissi STRING,
         misureLuce STRING,
         tipoTapparella STRING,
         coloreTapparella STRING
@@ -317,6 +358,10 @@ class DBHelper {
         telaio STRING,
         larghezzaLuce REAL,
         altezzaLuce REAL,
+        larghezzaCassonetto REAL,
+        altezzaCassonetto REAL,
+        spessoreCassonetto REAL,
+        profonditaCielino REAL,
         note STRING,
         idParente STRING,        
         disegno STRING,
@@ -351,12 +396,61 @@ class DBHelper {
         telaio STRING,
         larghezzaLuce REAL,
         altezzaLuce REAL,
+        larghezzaCassonetto REAL,
+        altezzaCassonetto REAL,
+        spessoreCassonetto REAL,
+        profonditaCielino REAL,
         note STRING,
         idParente STRING,        
         disegno STRING,
         blob STRING        
       )
       ''');
+  }
+
+  Future<List<String>> exportDatabase() async {
+    Database db = await instance.database;
+
+    ///directory dell'app
+    final directory = await getApplicationDocumentsDirectory();
+    final path = directory.path;
+    //var export = await dbExportSql(db);
+
+    var resultPersiane = await db.query('persiane');
+    var resultTapparelle = await db.query('tapparelle');
+    var resultConfigurazioneP = await db.query('configurazionePersiane');
+    var resultConfigurazioneT = await db.query('configurazioneTapparelle');
+
+    var csvPersiane = mapListToCsv(resultPersiane);
+    var csvTapparelle = mapListToCsv(resultTapparelle);
+    var csvConfigurazioneP = mapListToCsv(resultConfigurazioneP);
+    var csvConfigurazioneT = mapListToCsv(resultConfigurazioneT);
+
+    var csvPersianePath = '$path/persiane.csv';
+    var csvTapparellePath = '$path/tapparelle.csv';
+    var csvConfigurazionePPath = '$path/configurazionePersiane.csv';
+    var csvConfigurazioneTPath = '$path/configurazioneTapparelle.csv';
+
+    File(csvPersianePath).writeAsString(csvPersiane!);
+    File(csvTapparellePath).writeAsString(csvTapparelle!);
+    File(csvConfigurazionePPath).writeAsString(csvConfigurazioneP!);
+    File(csvConfigurazioneTPath).writeAsString(csvConfigurazioneT!);
+
+    Share.shareXFiles([
+      XFile(csvPersianePath),
+      XFile(csvTapparellePath),
+      XFile(csvConfigurazionePPath),
+      XFile(csvConfigurazioneTPath)
+    ]);
+
+    List<String> paths = [
+      '$path/persiane.csv',
+      '$path/tapparelle.csv',
+      '$path/configurazionePersiane.csv',
+      '$path/configurazioneTapparelle.csv'
+    ];
+
+    return paths;
   }
 
   Future<String> getDatabasePath() async {
@@ -430,7 +524,7 @@ class DBHelper {
     return null;
   }
 
-  Future<Configurazione?> getConfigurazione(
+  Future<Configurazione> getConfigurazione(
       int id, String tipoConfigurazione) async {
     Database db = await instance.database;
 
@@ -447,7 +541,10 @@ class DBHelper {
         return Configurazione.fromMap(result.first);
       }
     }
-    return null;
+    throw (e) {
+      print('error');
+    };
+    //return null;
   }
 
   Future<int> addTapparella(RilievoTapparella tapparella) async {
@@ -474,12 +571,16 @@ class DBHelper {
 
   Future<int> removeTapparella(int id) async {
     Database db = await instance.database;
-    return await db.delete('tapparelle', where: 'id = ?', whereArgs: [id]);
+    await db.delete('tapparelle', where: 'id = ?', whereArgs: [id]);
+    return await DBHelper.instance
+        .removeMoreConfigurazione(id, 'configurazioneTapparelle');
   }
 
-  Future<int> removePersiane(int id) async {
+  Future<int> removePersiana(int id) async {
     Database db = await instance.database;
-    return await db.delete('persiane', where: 'id = ?', whereArgs: [id]);
+    await db.delete('persiane', where: 'id = ?', whereArgs: [id]);
+    return await DBHelper.instance
+        .removeMoreConfigurazione(id, 'configurazionePersiane');
   }
 
   Future<int> removeConfigurazione(int id, String tipoConfigurazione) async {
@@ -495,14 +596,14 @@ class DBHelper {
   }
 
   Future<int> removeMoreConfigurazione(
-      int idPadre, String tipoConfigurazione) async {
+      int idParente, String tipoConfigurazione) async {
     Database db = await instance.database;
-    if (tipoConfigurazione.compareTo('persiane') == 0) {
+    if (tipoConfigurazione.compareTo('configurazionePersiane') == 0) {
       return await db.delete('configurazionePersiane',
-          where: 'idPadre = ?', whereArgs: [idPadre]);
-    } else if (tipoConfigurazione.compareTo('tapparelle') == 0) {
+          where: 'idParente = ?', whereArgs: [idParente]);
+    } else if (tipoConfigurazione.compareTo('configurazioneTapparelle') == 0) {
       return await db.delete('configurazioneTapparelle',
-          where: 'idPadre = ?', whereArgs: [idPadre]);
+          where: 'idParente = ?', whereArgs: [idParente]);
     }
     return 0;
   }

@@ -1,7 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="luigita.it.applicazione_prova">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <application
-        android:label="applicazione_prova"
+        android:label="Rilievi Nusco"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
