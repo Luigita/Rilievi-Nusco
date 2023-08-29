@@ -1,21 +1,24 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:flutter/services.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:gallery_saver/gallery_saver.dart';
 import 'package:signature/signature.dart';
-import 'dart:typed_data';
 
-import 'mio_database.dart';
-
+//import 'mio_database.dart';
+import 'nuovo_database.dart';
 
 class Disegno extends StatefulWidget {
-  final int? id;
+  //final int? id;
+  final String tipoConfigurazione;
+
+  final Configurazione configurazionePersiana;
 
   const Disegno(
-      {super.key, required this.id});
+      {super.key,
+      required this.configurazionePersiana,
+      required this.tipoConfigurazione});
 
   @override
   State<Disegno> createState() => _DisegnoState();
@@ -23,8 +26,8 @@ class Disegno extends StatefulWidget {
 
 class _DisegnoState extends State<Disegno> {
   // initialize the signature controller
-  final SignatureController _controller = SignatureController(
-    penStrokeWidth: 1,
+  late SignatureController _controller = SignatureController(
+    penStrokeWidth: 2,
     penColor: Colors.red,
     exportBackgroundColor: Colors.white,
     exportPenColor: Colors.black,
@@ -42,55 +45,63 @@ class _DisegnoState extends State<Disegno> {
   void dispose() {
     // IMPORTANT to dispose of the controller
     _controller.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
-  Future<void> exportImage(BuildContext context) async {
+  Future<void> exportImage(
+      BuildContext context, double firstWidth, double firstHeight) async {
     if (_controller.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           key: Key('snackbarPNG'),
-          content: Text('No content'),
+          content: Text('Nessun contenuto'),
         ),
       );
       return;
     }
 
-    final Uint8List? data =
-    await _controller.toPngBytes(height: 1000, width: 1000);
+    final Uint8List? data = await _controller.toPngBytes(
+        height: firstHeight.toInt(), width: firstWidth.toInt());
     if (data == null) {
       return;
     }
 
     //final bytes = await File(data.toString()).readAsBytes();
 
-    final base64Disegno= base64Encode(data);
+    final base64Disegno = base64Encode(data);
 
     try {
-      Rilievo? rilievo = await DBHelper.instance.getRilievo(widget.id!);
+      Configurazione? configurazione = await DBHelper.instance
+          .getConfigurazione(
+              widget.configurazionePersiana.id!, widget.tipoConfigurazione);
 
-      widget.id != null
-          ? await DBHelper.instance.update(
-        Rilievo(
-          id: widget.id,
-          nome: rilievo?.nome,
-          cognome: rilievo?.cognome,
-          blob: rilievo?.blob,
-          disegno: base64Disegno,
-        ),
-      )
-          : await DBHelper.instance.update(
-        Rilievo(
-          id: widget.id,
-          nome: rilievo?.nome,
-          cognome: rilievo?.cognome,
-          blob: rilievo?.blob,
-          disegno: base64Disegno,
-        ),
-      );
+      await DBHelper.instance.updateConfigurazione(
+          Configurazione(
+            id: widget.configurazionePersiana.id,
+            riferimento: configurazione.riferimento,
+            quantita: configurazione.quantita,
+            larghezza: configurazione.larghezza,
+            altezza: configurazione.altezza,
+            tipo: configurazione.tipo,
+            dxsx: configurazione.dxsx,
+            vetro: configurazione.vetro,
+            telaio: configurazione.telaio,
+            larghezzaLuce: configurazione.larghezzaLuce,
+            altezzaLuce: configurazione.altezzaLuce,
+            blob: configurazione.blob,
+            disegno: base64Disegno,
+            note: configurazione.note,
+            idParente: configurazione.idParente,
+          ),
+          widget.tipoConfigurazione);
     } catch (e) {
       print(e);
-      // TODO
     }
 
     if (!mounted) return;
@@ -98,8 +109,15 @@ class _DisegnoState extends State<Disegno> {
     await push(
       context,
       Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+          child: const Icon(Icons.check),
+        ),
         appBar: AppBar(
-          title: const Text('PNG Image'),
+          title: const Text('Anteprima'),
         ),
         body: Center(
           child: Container(
@@ -150,7 +168,6 @@ class _DisegnoState extends State<Disegno> {
   //     );
   //   } catch (e) {
   //     print(e);
-  //     // TODO
   //   }
   //
   //   if (!mounted) return;
@@ -173,9 +190,23 @@ class _DisegnoState extends State<Disegno> {
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.of(context).size.width > 600) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+    double firstHeight = MediaQuery.of(context).size.height;
+    double firstWidth = MediaQuery.of(context).size.width;
+    List<Point> exportedPoints;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Signature Demo'),
+        title: const Text('Disegno tecnico'),
       ),
       body: ListView(
         children: <Widget>[
@@ -189,7 +220,8 @@ class _DisegnoState extends State<Disegno> {
           Signature(
             key: const Key('signature'),
             controller: _controller,
-            //height: 300,
+            height: firstHeight,
+            width: firstWidth,
             backgroundColor: Colors.grey[300]!,
           ),
           //OK AND CLEAR BUTTONS
@@ -214,16 +246,21 @@ class _DisegnoState extends State<Disegno> {
                 key: const Key('exportPNG'),
                 icon: const Icon(Icons.save),
                 color: Colors.blue,
-                onPressed: () => exportImage(context),
-                tooltip: 'Export Image',
+                onPressed: () => {
+                  exportImage(context, firstWidth, firstHeight),
+                },
+                tooltip: 'Save',
               ),
-              // IconButton(
-              //   key: const Key('exportSVG'),
-              //   icon: const Icon(Icons.share),
-              //   color: Colors.blue,
-              //   onPressed: () => exportSVG(context),
-              //   tooltip: 'Export SVG',
-              // ),
+              IconButton(
+                key: const Key('exportSVG'),
+                icon: const Icon(Icons.share),
+                color: Colors.blue,
+                onPressed: () {
+                  exportedPoints = _controller.points;
+                  _controller = SignatureController(points: exportedPoints);
+                },
+                tooltip: 'Export SVG',
+              ),
               IconButton(
                 icon: const Icon(Icons.undo),
                 color: Colors.blue,

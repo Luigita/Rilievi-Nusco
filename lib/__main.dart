@@ -1,21 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:applicazione_prova/mio_database.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:signature/signature.dart';
-
-import 'dart:async';
-import 'dart:io';
-
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-
-//import 'foto.dart';
-import '__main.dart';
-import 'mio_database.dart';
 
 Future main() async {
   // Avoid errors caused by flutter upgrade.
