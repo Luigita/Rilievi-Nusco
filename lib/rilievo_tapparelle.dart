@@ -39,8 +39,8 @@ class _RilievoTapparelleState extends State<RilievoTapparelle>
     with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GestureDetector(
+    return Scaffold(
+      body: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
@@ -84,8 +84,8 @@ class InserimentoIntestazioneTapparelleState
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GestureDetector(
+    return Scaffold(
+      body: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
@@ -264,7 +264,7 @@ class InserimentoIntestazioneTapparelleState
                   textController[13].clear();
                   selectedId = null;
                 });
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(context);
               }
             },
             child: const Icon(Icons.save),

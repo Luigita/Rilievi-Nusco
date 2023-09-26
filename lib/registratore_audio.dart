@@ -11,6 +11,8 @@ import 'package:flutter_sound/flutter_sound.dart';
 
 import 'nuovo_database.dart';
 
+// TODO: CREA UN VIDEO CON L'IMMAGINE RUOTATA DI 90 GRADI
+
 class RegistraAudio extends StatefulWidget {
   final Configurazione configurazione;
   final String tipoConfigurazione;
@@ -25,7 +27,7 @@ class RegistraAudio extends StatefulWidget {
 }
 
 class _RegistraAudioState extends State<RegistraAudio> {
-  var tempoRegistrato;
+  var tempoRegistrato = 0;
 
   final audioPlayer = audio.AudioPlayer();
   bool isPlaying = false;
@@ -77,7 +79,7 @@ class _RegistraAudioState extends State<RegistraAudio> {
 
   @override
   void dispose() {
-    recorder.closeRecorder();
+    //recorder.closeRecorder();
 
     audioPlayer.dispose();
 
@@ -85,7 +87,7 @@ class _RegistraAudioState extends State<RegistraAudio> {
   }
 
   Future initRecorder() async {
-    await recorder.openRecorder();
+    //await recorder.openRecorder();
 
     isRecorderReady = true;
     recorder.setSubscriptionDuration(
@@ -130,8 +132,13 @@ class _RegistraAudioState extends State<RegistraAudio> {
     await io.File(photoPath).writeAsBytes(photoData);
 
     final FlutterFFmpeg flutterFFmpeg = FlutterFFmpeg();
+
+    ///*********argomenti per l'esecuzione del comando ffmpeg*********///
+
     final arguments =
-        '-loop 1 -i $photoPath -i $audioPath -y -t $tempoRegistrato $outputVideoPath';
+      '-loop 1 -i $photoPath -i $audioPath -y -t $tempoRegistrato $outputVideoPath';
+
+    ///**************************************************************///
 
     int result = await flutterFFmpeg.execute(arguments);
 
@@ -206,7 +213,7 @@ class _RegistraAudioState extends State<RegistraAudio> {
                       },
                     ),
 
-                    ///portare fuori da streambuilder, riproduce l'audio precedente ma con il tempo di registrazione di quello attuale///
+                    ///TODO: portare fuori da streambuilder, riproduce l'audio precedente ma con il tempo di registrazione di quello attuale
                     Column(
                       children: [
                         //Text('${duration.inSeconds} s'),
@@ -236,6 +243,7 @@ class _RegistraAudioState extends State<RegistraAudio> {
                                     if (isPlaying) {
                                       //_RegistraAudioState().initState();
                                       await audioPlayer.pause();
+                                      isPlaying = false;
                                     } else {
                                       await audioPlayer.resume();
                                     }

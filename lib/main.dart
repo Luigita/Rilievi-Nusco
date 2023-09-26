@@ -44,7 +44,7 @@ Future main() async {
 
     title: 'Rilievi Nusco',
     theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       useMaterial3: true,
     ),
     home: SelezionaModulo(camera: firstCamera),
@@ -63,42 +63,43 @@ class SelezionaModulo extends StatefulWidget {
 }
 
 class _SelezionaModuloState extends State<SelezionaModulo> {
+
   AppUpdateInfo? _updateInfo;
 
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
 
-  //bool _flexibleUpdateAvailable = false;
-
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      setState(() {
-        _updateInfo = info;
-      });
-    }).catchError((e) {
-      showSnack(e.toString());
-    });
-  }
-
-  void showSnack(String text) {
-    if (_scaffoldKey.currentContext != null) {
-      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-          .showSnackBar(SnackBar(content: Text(text)));
-    }
-  }
+  /// TODO: CERCARE AGGIORNAMENTI ALL'AVVIO E INSTALLARLI AUTOMATICAMENTE
+  /// Future<void> checkForUpdate() async {
+  ///   InAppUpdate.checkForUpdate().then((info) {
+  ///     setState(() {
+  ///       _updateInfo = info;
+  ///     });
+  ///   }).catchError((e) {
+  ///     showSnack(e.toString());
+  ///   });
+  /// }
+  ///
+  /// void showSnack(String text) {
+  ///   if (_scaffoldKey.currentContext != null) {
+  ///     ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+  ///         .showSnackBar(SnackBar(content: Text(text)));
+  ///   }
+  /// }
 
   @override
   Widget build(BuildContext context) {
-    checkForUpdate();
-    _updateInfo?.updateAvailability == UpdateAvailability.updateAvailable
-        ? () {
-            InAppUpdate.performImmediateUpdate()
-                .catchError((e) => showSnack(e.toString()));
-          }
-        : null;
+    /// checkForUpdate();
+    /// _updateInfo?.updateAvailability == UpdateAvailability.updateAvailable
+    ///     ? () {
+    ///         InAppUpdate.performImmediateUpdate()
+    ///             .catchError((e) => showSnack(e.toString()));
+    ///       }
+    ///     : null;
 
-    return MaterialApp(
-      home: GestureDetector(
+    return Scaffold(
+      //theme: ThemeData(colorSchemeSeed: ),
+      body: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
@@ -220,12 +221,14 @@ class _SelezionaModuloState extends State<SelezionaModulo> {
                             style: GoogleFonts.openSans(fontSize: 16),
                           ),
                         )),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
+                    onTap: () async {
+                      await Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => RilievoPersiane(
                                 camera: widget.camera,
                               )));
-                    }),
+                      setState(() {});
+                    }
+                    ),
                 GestureDetector(
                     child: Container(
                         width: 170,
@@ -252,11 +255,14 @@ class _SelezionaModuloState extends State<SelezionaModulo> {
                           ),
                         )),
                     ///************************///
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(
-                          builder: (BuildContext context) => RilievoTapparelle(
+                    onTap: () async {
+                      await Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => RilievoTapparelle(
                                 camera: widget.camera,
                               )));
+                      setState(() {
+
+                      });
                     }
                     ///*************************///
                 )

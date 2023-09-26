@@ -15,21 +15,27 @@ class DettaglioPosizione extends StatelessWidget {
 
   @override
   Widget build(context) {
-
     double firstHeight = MediaQuery.of(context).size.height;
     double firstWidth = MediaQuery.of(context).size.width;
 
-    return MaterialApp(
-      home: GestureDetector(
-        onTap: () {FocusManager.instance.primaryFocus?.unfocus();},
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
         child: Scaffold(
+          // floatingActionButton: FloatingActionButton(
+          //     child: const Icon(Icons.arrow_back),
+          //     onPressed: () async {
+          //       Navigator.of(context).pop();
+          //     }),
           appBar: AppBar(
             title: const Text("Dettaglio posizione"),
           ),
           body: FutureBuilder<Configurazione>(
-            future: DBHelper.instance.getConfigurazione(id!, tipoConfigurazione),
-            builder:
-                (context, AsyncSnapshot<Configurazione> snapshot) {
+            future:
+                DBHelper.instance.getConfigurazione(id!, tipoConfigurazione),
+            builder: (context, AsyncSnapshot<Configurazione> snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: Text('Caricamento ...'));
               }
@@ -53,19 +59,18 @@ class DettaglioPosizione extends StatelessWidget {
                           snapshot.data!.toStringFormatted()[12] +
                           snapshot.data!.toStringFormatted()[13] +
                           snapshot.data!.toStringFormatted()[14],
-                      style: const TextStyle(height: 1.5),
+                      style: const TextStyle(height: 1.5, fontSize: 16),
                     ),
                     Row(
                       children: [
-                        Image.memory(base64Decode(snapshot.data!.blob.toString()),
+                        Image.memory(
+                            base64Decode(snapshot.data!.blob.toString()),
                             height: (firstHeight / 2) - 8,
-                            width: (firstWidth / 2) - 8
-                        ),
+                            width: (firstWidth / 2) - 8),
                         Image.memory(
                             base64Decode(snapshot.data!.disegno.toString()),
                             height: (firstHeight / 2) - 8,
-                            width: (firstWidth / 2) - 8
-                        ),
+                            width: (firstWidth / 2) - 8),
                       ],
                     ),
                   ],

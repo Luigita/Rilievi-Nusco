@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:applicazione_prova/rilievo_persiane.dart';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -9,8 +10,10 @@ import 'package:sqflite/sqflite.dart';
 //import 'package:sqflite_common_porter/sqflite_porter.dart';
 import 'utils_csv.dart';
 
+int posizioni = 0;
 
 class RilievoTapparella {
+  late int posizioni = 0;
   @required
   final int? id;
   String? cliente;
@@ -108,6 +111,7 @@ class RilievoTapparella {
 }
 
 class RilievoPersiana {
+  late int posizioni = 0;
   @required
   final int? id;
   String? cliente;
@@ -174,6 +178,7 @@ class RilievoPersiana {
 }
 
 class Configurazione {
+
   @required
   final int? id;
   String? riferimento;
@@ -452,10 +457,21 @@ class DBHelper {
 
     var encoder = ZipFileEncoder();
     encoder.create(zipDatabasePath);
-    encoder.addFile(File(csvPersianePath));
-    encoder.addFile(File(csvTapparellePath));
-    encoder.addFile(File(csvConfigurazionePPath));
-    encoder.addFile(File(csvConfigurazioneTPath));
+
+    /// if (!resultConfigurazioneT.isempty) per evitare csv vuoti che danno problemi con convertitore python
+    if (resultPersiane.isNotEmpty) {
+      encoder.addFile(File(csvPersianePath));
+    }
+    if (resultTapparelle.isNotEmpty) {
+      encoder.addFile(File(csvTapparellePath));
+    }
+    if (resultConfigurazioneP.isNotEmpty) {
+      encoder.addFile(File(csvConfigurazionePPath));
+    }
+    if (resultConfigurazioneT.isNotEmpty) {
+      encoder.addFile(File(csvConfigurazioneTPath));
+    }
+
     encoder.close();
 
     Share.shareXFiles([
@@ -662,5 +678,16 @@ class DBHelper {
     int? count = Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM $tableName'));
     return (count);
+  }
+  
+  Future<int> contaPosizioniPersiane(String tableName, RilievoPersiana rilievoPersiana) async {
+    Database db = await instance.database;
+    var result = await db.query(tableName, where: 'idParente = ${rilievoPersiana.id}');
+    return rilievoPersiana.posizioni = result.length;
+  }
+  Future<int> contaPosizioniTapparelle(String tableName, RilievoTapparella rilievoTapparelle) async {
+    Database db = await instance.database;
+    var result = await db.query(tableName, where: 'idParente = ${rilievoTapparelle.id}');
+    return rilievoTapparelle.posizioni = result.length;
   }
 }

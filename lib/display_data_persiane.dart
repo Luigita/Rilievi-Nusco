@@ -6,11 +6,14 @@
 // import 'package:applicazione_prova/rilievo_persiane.dart';
 // import 'package:applicazione_prova/rilievo_tapparelle.dart';
 import 'package:applicazione_prova/dropdownVetro.dart';
+import 'package:applicazione_prova/nuovo_registratore.dart';
+import 'package:applicazione_prova/rilievo_persiane.dart';
 import 'package:applicazione_prova/tendinaTipologia.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import 'nuovo_database.dart';
 import 'dettaglio_posizione.dart';
 import 'disegno.dart';
 //import 'fotocamera.dart';
@@ -73,6 +76,7 @@ class _DisplayDataState extends State<DisplayDataPersiana> {
               ? const Center(child: Text('Lista vuota'))
               : ListView(
                   children: snapshot.data!.map((rilievoPersiane) {
+                    DBHelper.instance.contaPosizioniPersiane("configurazionePersiane", rilievoPersiane);
                   return Card(
                     color: Colors.white70,
                     child: Slidable(
@@ -94,7 +98,7 @@ class _DisplayDataState extends State<DisplayDataPersiana> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          "Conferma",
+                                          "Conferma eliminazione",
                                         ),
                                       ],
                                     ),
@@ -142,65 +146,81 @@ class _DisplayDataState extends State<DisplayDataPersiana> {
                           setState(() {});
                         }),
 
-                        // All actions are defined in the children parameter.
-                        children: const [
-                          // A SlidableAction can have an icon and/or a label.
-                          SlidableAction(
-                            onPressed: print,
-                            backgroundColor: Color(0xFFFE4A49),
-                            foregroundColor: Colors.white,
-                            icon: Icons.delete,
-                            label: 'Delete',
+                            // All actions are defined in the children parameter.
+                            children: const [
+                              // A SlidableAction can have an icon and/or a label.
+                              SlidableAction(
+                                onPressed: print,
+                                backgroundColor: Color(0xFFFE4A49),
+                                foregroundColor: Colors.white,
+                                icon: Icons.delete,
+                                label: 'Delete',
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      endActionPane: ActionPane(
-                        // A motion is a widget used to control how the pane animates.
-                        motion: const ScrollMotion(),
-                        // A pane can dismiss the Slidable.
-                        dismissible: DismissiblePane(onDismissed: () {
-                          setState(() {});
-                        }),
-                        // All actions are defined in the children parameter.
-                        children: const [
-                          // A SlidableAction can have an icon and/or a label.
-                          SlidableAction(
-                            onPressed: print,
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            icon: Icons.edit,
-                            label: 'Modifica',
+                          endActionPane: ActionPane(
+                            // A motion is a widget used to control how the pane animates.
+                            motion: const ScrollMotion(),
+                            // A pane can dismiss the Slidable.
+                            dismissible: DismissiblePane(onDismissed: () {
+                              setState(() {});
+                            }),
+                            // All actions are defined in the children parameter.
+                            children: const [
+                              // A SlidableAction can have an icon and/or a label.
+                              SlidableAction(
+                                // TODO: aggiungere modifica come per le singole posizioni
+                                onPressed: print,
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                icon: Icons.edit,
+                                label: 'Modifica',
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: ListTile(
-                        onTap: () async {
-                          await Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => VisualizzaPosizioniPersiane(
-                                  camera: widget.camera,
-                                  parentId: rilievoPersiane.id)));
-                          setState(() {});
-                        },
-                        title: Text('${rilievoPersiane.cliente} '
-                            ' '
-                            '${rilievoPersiane.destinazione} '
-                            ' '
-                            '${rilievoPersiane.data}'),
-                        subtitle: Column(
-                          children: [
-                            Text('${rilievoPersiane.modelloPorta} '
+                          child: ListTile(
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => VisualizzaPosizioniPersiane(
+                                      camera: widget.camera,
+                                      parentId: rilievoPersiane.id)));
+                              setState(() {});
+                            },
+                            trailing: FutureBuilder<Widget>(
+                              future: numeroPosizioniPersiane(rilievoPersiane),
+                              builder: (context, snaposhot){
+                                if(snapshot.connectionState == ConnectionState.done){
+                                  return Text("${rilievoPersiane.posizioni} posizioni");
+                                }
+                                else if(snapshot.hasError){
+                                  throw snapshot.error!;
+                                }
+                                else{
+                                  return Center(child: CircularProgressIndicator());
+                                }
+                              }
+                            ),
+                            title: Text('${rilievoPersiane.cliente} '
                                 ' '
-                                '${rilievoPersiane.finituraInterna} '
+                                '${rilievoPersiane.destinazione} '
                                 ' '
-                                '${rilievoPersiane.modelloManiglia} '
-                                ' '
-                                '${rilievoPersiane.ferramenta} '),
-                          ],
+                                '${rilievoPersiane.data}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('${rilievoPersiane.modelloPorta} '
+                                    ' '
+                                    '${rilievoPersiane.finituraInterna} '
+                                    ' '
+                                    '${rilievoPersiane.modelloManiglia} '
+                                    ' '
+                                    '${rilievoPersiane.ferramenta} '),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList());
+                      );
+                    }).toList());
         },
       ),
     );
@@ -424,7 +444,6 @@ class _VisualizzaPosizioniPersianeState
                                       },
                                       child: const Icon(
                                         Icons.edit,
-                                        color: Colors.white,
                                       ),
                                     ),
                                     const VerticalDivider(
@@ -437,12 +456,14 @@ class _VisualizzaPosizioniPersianeState
                                             await Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        RegistraAudio(
-                                                          configurazione:
-                                                              configurazionePersiana,
-                                                          tipoConfigurazione:
-                                                              'persiane',
-                                                        )));
+                                                        SoundRecorder(configurazione: configurazionePersiana, tipoConfigurazione: "persiane")
+                                                        // RegistraAudio(
+                                                        //   configurazione:
+                                                        //       configurazionePersiana,
+                                                        //   tipoConfigurazione:
+                                                        //       'persiane',
+                                                        // )));
+                                                        ));
                                           }
                                         },
                                         child:
@@ -454,8 +475,7 @@ class _VisualizzaPosizioniPersianeState
                                 ),
                               ),
                             )
-
-                          ///TODO: mette un widget vuoto, da cambiare
+                          /// TODO: mette un widget vuoto, da cambiare
                           : const SizedBox.shrink(),
                     );
                   }).toList(),
@@ -531,8 +551,8 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: WillPopScope(
+    return Scaffold(
+        body: WillPopScope(
       onWillPop: () async {
         return shouldPop;
       },
@@ -902,4 +922,11 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
       ),
     ));
   }
+}
+Future<Widget> numeroPosizioniPersiane(RilievoPersiana rilievoPersiane) async {
+
+  await DBHelper.instance.contaPosizioniPersiane("configurazionePersiane", rilievoPersiane);
+
+  return Text("${rilievoPersiane.posizioni} posizioni");
+
 }

@@ -23,6 +23,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 String tipoManigliaPersiane = "";
 String tipoFinituraPersiane = "";
+String modelloPersiane = "";
 
 class RilievoPersiane extends StatefulWidget {
   const RilievoPersiane({super.key, required this.camera});
@@ -37,8 +38,8 @@ class _RilievoPersianeState extends State<RilievoPersiane>
     with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GestureDetector(
+    return Scaffold(
+      body: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
@@ -82,8 +83,8 @@ class InserimentoIntestazionePersianeState
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GestureDetector(
+    return Scaffold(
+      body: GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
@@ -116,14 +117,14 @@ class InserimentoIntestazionePersianeState
                 TextField(
                   decoration: InputDecoration(
                       suffixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_month),
-                    onPressed: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2019, 1),
-                        lastDate: DateTime(2099, 12),
-                      );
+                        icon: const Icon(Icons.calendar_month),
+                        onPressed: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2019, 1),
+                            lastDate: DateTime(2099, 12),
+                          );
                       if (pickedDate != null) {
                         //print(pickedDate.toLocal());  //pickedDate output format => 2021-03-10 00:00:00.000
                         String formattedDate =
@@ -148,13 +149,8 @@ class InserimentoIntestazionePersianeState
                   controller: textController[2],
                 ),
                 const Divider(),
-                const Text('Modello porta'),
-                TextField(
-                  scrollPadding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  textInputAction: TextInputAction.next,
-                  controller: textController[3],
-                ),
+                const Text('Modello'),
+                Dropdown(variabile: modelloPersiane, stringa: "modelloPersiane", condizione: "modello"),
                 const Divider(),
                 const Text('Modello maniglia'),
                 Dropdown(variabile: tipoManigliaPersiane, stringa: "tipoManigliaPersiane", condizione: "maniglia"),
@@ -190,7 +186,7 @@ class InserimentoIntestazionePersianeState
                           cliente: textController[0].text,
                           destinazione: textController[1].text,
                           data: textController[2].text,
-                          modelloPorta: textController[3].text,
+                          modelloPorta: modelloPersiane,
                           modelloManiglia: tipoManigliaPersiane,
                           finituraInterna: tipoFinituraPersiane,
                           commerciale: textController[6].text,
@@ -201,7 +197,7 @@ class InserimentoIntestazionePersianeState
                         cliente: textController[0].text,
                         destinazione: textController[1].text,
                         data: textController[2].text,
-                        modelloPorta: textController[3].text,
+                        modelloPorta: modelloPersiane,
                         modelloManiglia: tipoManigliaPersiane,
                         finituraInterna: tipoFinituraPersiane,
                         commerciale: textController[6].text,

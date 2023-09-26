@@ -5,6 +5,7 @@
 // import 'package:applicazione_prova/rilievo_persiane.dart';
 // import 'package:applicazione_prova/rilievo_tapparelle.dart';
 import 'package:applicazione_prova/dropdownTelaio.dart';
+import 'package:applicazione_prova/registratore_audio.dart';
 import 'package:applicazione_prova/tendinaTipologia.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'nuova_fotocamera.dart';
 // //import 'package:sqflite/sqflite.dart';
 import 'dettaglio_posizione.dart';
 import 'nuovo_database.dart';
+import 'nuovo_registratore.dart';
 
 String _riferimento = "";
 String _quantita = "0";
@@ -64,15 +66,6 @@ class _DisplayDataState extends State<DisplayDataTapparella> {
       //   child: const Icon(Icons.add),
       // ),
       appBar: AppBar(
-        // actions: [
-        //   ElevatedButton(
-        //     onPressed: () async {
-        //       ///TODO: VA IN SCHERMO NERO, DA SISTEMARE
-        //       Navigator.of(context).pop();
-        //     },
-        //     child: const Icon(Icons.arrow_back),
-        //   )
-        // ],
         title: const Text('Tapparelle - Visualizzazione dati'),
       ),
       body: FutureBuilder<List<RilievoTapparella>>(
@@ -108,7 +101,7 @@ class _DisplayDataState extends State<DisplayDataTapparella> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Conferma",
+                                            "Conferma eliminazione",
                                           ),
                                         ],
                                       ),
@@ -196,6 +189,20 @@ class _DisplayDataState extends State<DisplayDataTapparella> {
                                         parentId: rilievoTapparelle.id)));
                             setState(() {});
                           },
+                          trailing: FutureBuilder<Widget>(
+                              future: numeroPosizioniTapparelle(rilievoTapparelle),
+                              builder: (context, snaposhot){
+                                if(snapshot.connectionState == ConnectionState.done){
+                                  return Text("${rilievoTapparelle.posizioni} posizioni");
+                                }
+                                else if(snapshot.hasError){
+                                  throw snapshot.error!;
+                                }
+                                else{
+                                  return Center(child: CircularProgressIndicator());
+                                }
+                              }
+                          ),
                           title: Text('${rilievoTapparelle.cantiere} '
                               ' '
                               '${rilievoTapparelle.cliente} '
@@ -460,16 +467,53 @@ class _VisualizzaPosizioniTapparelleState
                                       },
                                       child: const Icon(
                                         Icons.edit,
-                                        color: Colors.white,
                                       ),
                                     ),
                                     const VerticalDivider(
                                       width: 5,
                                     ),
                                     ElevatedButton(
-                                      onPressed: () async {},
-                                      child: const Icon(Icons.mic),
-                                    ),
+                                        onPressed: () async {
+                                          if (configurazioneTapparella.blob !=
+                                              null) {
+                                            await Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SoundRecorder(configurazione: configurazioneTapparella, tipoConfigurazione: "tapparelle")
+                                                  // RegistraAudio(
+                                                  //   configurazione:
+                                                  //       configurazionePersiana,
+                                                  //   tipoConfigurazione:
+                                                  //       'persiane',
+                                                  // )));
+                                                ));
+                                          }
+                                        },
+                                        child:
+                                        configurazioneTapparella.blob != null
+                                            ? const Icon(Icons.mic)
+                                            : const Icon(Icons.mic,
+                                            color: Colors.red)),
+                                    // ElevatedButton(
+                                    //     onPressed: () async {
+                                    //       if (configurazioneTapparella.blob !=
+                                    //           null) {
+                                    //         await Navigator.of(context).push(
+                                    //             MaterialPageRoute(
+                                    //                 builder: (context) =>
+                                    //                     RegistraAudio(
+                                    //                       configurazione:
+                                    //                       configurazioneTapparella,
+                                    //                       tipoConfigurazione:
+                                    //                       'tapparelle',
+                                    //                     )));
+                                    //       }
+                                    //     },
+                                    //     child:
+                                    //     configurazioneTapparella.blob != null
+                                    //         ? const Icon(Icons.mic)
+                                    //         : const Icon(Icons.mic,
+                                    //         color: Colors.red)),
                                   ],
                                 ),
                               ),
@@ -563,8 +607,8 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: GestureDetector(
+    return Scaffold(
+        body: GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
@@ -1091,4 +1135,12 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
       ),
     ));
   }
+}
+
+Future<Widget> numeroPosizioniTapparelle(RilievoTapparella rilievoTapparelle) async {
+
+  await DBHelper.instance.contaPosizioniTapparelle("configurazioneTapparelle", rilievoTapparelle);
+
+  return Text("${rilievoTapparelle.posizioni} posizioni");
+
 }

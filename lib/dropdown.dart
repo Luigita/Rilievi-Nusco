@@ -69,6 +69,13 @@ const List<String> coloriTapparelle = <String>[
   'colore 3',
   'colore 4',
 ];
+const List<String> modelli = <String>[
+  'modello 1',
+  'modello 2',
+  'modello 3',
+  'modello 4',
+];
+
 
 class Dropdown extends StatefulWidget {
   Dropdown(
@@ -534,6 +541,44 @@ class _DropdownState extends State<Dropdown> {
               widget.variabile = value;
             },
             items: coloriTapparelle.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Row(
+                  children: [
+                    Text(value),
+                  ],
+                ),
+              );
+            }).toList(),
+          );
+        } else {
+          throw Exception("Parametro non corretto");
+        }
+      }
+    }
+    else if (widget.condizione == "modello") {
+      {
+        if (widget.variabile == "") {
+          if (widget.stringa == "modelloPersiane") {
+            dropdownValue = modelli.first;
+            modelloPersiane = dropdownValue;
+          }
+        } else {
+          dropdownValue = widget.variabile;
+        }
+        if (widget.stringa == "modelloPersiane") {
+          return DropdownButton(
+            isExpanded: true,
+            value: dropdownValue,
+            onChanged: (String? value) {
+              // This is called when the user selects an item.
+              setState(() {
+                dropdownValue = value!;
+              });
+              modelloPersiane = value!;
+              widget.variabile = value;
+            },
+            items: modelli.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Row(
