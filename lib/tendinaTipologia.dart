@@ -2,10 +2,17 @@ import 'package:applicazione_prova/display_data_persiane.dart';
 import 'package:applicazione_prova/display_data_tapparelle.dart';
 import 'package:flutter/material.dart';
 
+///*********** images (ovvero le tipologie di infissi) ***************///
+///** deve iniziare SEMPRE con una finestra e non una portafinestra **///
 Map<String, String> images = {
-  'PF1AR': 'assets/images/SAL_F1AR-ST76.jpg',
-  'PF2AR': 'assets/images/SAL_F2AR-ST76.jpg',
-  'PF3AR': 'assets/images/SAL_F3ARM-ST76.jpg',
+  'F1AR': 'assets/images/F1AR.jpg',
+  'F2AR': 'assets/images/F2AR.jpg',
+  'F3AR': 'assets/images/F3AR.jpg',
+  'F4AR': 'assets/images/F4AR.jpg',
+  'PF1AR': 'assets/images/PF1AR.jpg',
+  'PF2AR': 'assets/images/PF2AR.jpg',
+  'PF3AR': 'assets/images/PF3AR.jpg',
+  'PF4AR': 'assets/images/PF4AR.jpg',
 };
 Map<String, String> profili = {
   'BG73': 'assets/images/MAX73.jpg',
@@ -14,7 +21,9 @@ Map<String, String> profili = {
 };
 
 class TendinaTipologia extends StatefulWidget {
-  TendinaTipologia({super.key, required this.text, required this.stringa});
+
+  final Function() notifyParent; ///notifica al widget superiore quando cambiare stato
+  TendinaTipologia({super.key, required this.text, required this.stringa, required this.notifyParent});
 
   //String textController;
   late String text;
@@ -34,13 +43,15 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
         dropdownValue = images.keys.first;
         tipoPersiane = dropdownValue;
         tipoTapparelle = dropdownValue;
-      } else if (widget.stringa == "tipoProfiloPersiane" ||
+      }
+      else if (widget.stringa == "tipoProfiloPersiane" ||
           widget.stringa == "tipoProfiloTapparelle") {
         dropdownValue = profili.keys.first;
         tipoProfiloTapparelle = dropdownValue;
         tipoProfiloPersiane = dropdownValue;
       }
-    } else {
+    }
+    else {
       dropdownValue = widget.text;
     }
     // return DropdownButton(
@@ -69,6 +80,7 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
     //   }).toList(),
     // );
 
+    ///per tipo finestra perisane
     if (widget.stringa == "tipoPersiane") {
       return DropdownButton(
         itemHeight: 120,
@@ -77,11 +89,12 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
         //icon: const Icon(Icons.arrow_downward),
         onChanged: (String? value) {
           // This is called when the user selects an item.
-          setState(() {
-            dropdownValue = value!;
-          });
           tipoPersiane = value!;
           widget.text = value;
+          setState(() {
+            dropdownValue = value;
+          });
+          widget.notifyParent();
         },
         items: images.keys.map((key) {
           return DropdownMenuItem(
@@ -99,7 +112,9 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
           );
         }).toList(),
       );
-    } else if (widget.stringa == "tipoProfiloPersiane") {
+    }
+    ///per profili persiane
+    else if (widget.stringa == "tipoProfiloPersiane") {
       return DropdownButton(
         itemHeight: 90,
         isExpanded: true,
@@ -107,11 +122,13 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
         //icon: const Icon(Icons.arrow_downward),
         onChanged: (String? value) {
           // This is called when the user selects an item.
-          setState(() {
-            dropdownValue = value!;
-          });
           tipoProfiloPersiane = value!;
           widget.text = value;
+          setState(() {
+            dropdownValue = value;
+          });
+          /// modifica lo stato del parent, utilizzato per aggiornare una lista che dipende dal Profilo
+          // widget.notifyParent();
         },
         items: profili.keys.map((key) {
           return DropdownMenuItem(
@@ -129,7 +146,10 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
           );
         }).toList(),
       );
-    } else if (widget.stringa == "tipoTapparelle") {
+    }
+
+    ///per tipo finestra tapparelle
+    else if (widget.stringa == "tipoTapparelle") {
       return DropdownButton(
         itemHeight: 120,
         isExpanded: true,
@@ -137,11 +157,12 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
         //icon: const Icon(Icons.arrow_downward),
         onChanged: (String? value) {
           // This is called when the user selects an item.
-          setState(() {
-            dropdownValue = value!;
-          });
           tipoTapparelle = value!;
           widget.text = value;
+          setState(() {
+            dropdownValue = value;
+          });
+          widget.notifyParent();
         },
         items: images.keys.map((key) {
           return DropdownMenuItem(
@@ -159,7 +180,9 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
           );
         }).toList(),
       );
-    } else if (widget.stringa == "tipoProfiloTapparelle") {
+    }
+    ///per profili tapparelle
+    else if (widget.stringa == "tipoProfiloTapparelle") {
       return DropdownButton(
         itemHeight: 90,
         isExpanded: true,
@@ -167,11 +190,13 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
         //icon: const Icon(Icons.arrow_downward),
         onChanged: (String? value) {
           // This is called when the user selects an item.
-          setState(() {
-            dropdownValue = value!;
-          });
           tipoProfiloTapparelle = value!;
           widget.text = value;
+          setState(() {
+            dropdownValue = value;
+          });
+          /// modifica lo stato del parent, utilizzato per aggiornare una lista che dipende dal Profilo
+          // widget.notifyParent();
         },
         items: profili.keys.map((key) {
           return DropdownMenuItem(
@@ -189,7 +214,9 @@ class _TendinaTipologiaState extends State<TendinaTipologia> {
           );
         }).toList(),
       );
-    } else {
+    }
+
+    else {
       throw Exception("Parametro non corretto");
     }
   }

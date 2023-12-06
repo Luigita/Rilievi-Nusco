@@ -124,7 +124,7 @@ class InserimentoIntestazioneTapparelleState
                         context: context,
                         initialDate: DateTime.now(),
                         firstDate: DateTime(2019, 1),
-                        lastDate: DateTime(2024, 12),
+                        lastDate: DateTime(2099, 12),
                       );
                       if (pickedDate != null) {
                         // print(pickedDate
@@ -222,8 +222,8 @@ class InserimentoIntestazioneTapparelleState
                           colorazioneEst: tipoColoreEstTapparelle,
                           listelliInt: tipoListelliIntTapparelle,
                           listelliEst: tipoListelliEstTapparelle,
-                          larghezzaInfissi: (textController[9].text),
-                          altezzaInfissi: (textController[10].text),
+                          larghezzaInfissi: textController[9].text,
+                          altezzaInfissi: textController[10].text,
                           misureLuce: textController[11].text,
                           tipoTapparella: tipoTapparellaTapparelle,
                           coloreTapparella: coloreTapparellaTapparelle,
@@ -240,8 +240,8 @@ class InserimentoIntestazioneTapparelleState
                           colorazioneEst: tipoColoreEstTapparelle,
                           listelliInt: tipoListelliIntTapparelle,
                           listelliEst: tipoListelliEstTapparelle,
-                          larghezzaInfissi: (textController[9].text),
-                          altezzaInfissi: (textController[10].text),
+                          larghezzaInfissi: textController[9].text,
+                          altezzaInfissi: textController[10].text,
                           misureLuce: textController[11].text,
                           tipoTapparella: tipoTapparellaTapparelle,
                           coloreTapparella: coloreTapparellaTapparelle,
@@ -264,7 +264,7 @@ class InserimentoIntestazioneTapparelleState
                   textController[13].clear();
                   selectedId = null;
                 });
-                Navigator.of(context).pop(context);
+                Navigator.of(context).pop();
               }
             },
             child: const Icon(Icons.save),

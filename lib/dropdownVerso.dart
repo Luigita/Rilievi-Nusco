@@ -2,39 +2,42 @@ import 'package:applicazione_prova/display_data_persiane.dart';
 import 'package:applicazione_prova/display_data_tapparelle.dart';
 import 'package:flutter/material.dart';
 
-const List<String> telaio = <String>[
-  'Anta su Anta',
-  'L 68MM BG',
-  'L 55MM + Aletta Z 35mm BG',
-  'L 55MM + Aletta Z 58mm BG',
+const List<String> versi = <String>[
+  'Dx',
+  'Sx',
+  'Dx Lat 3-2-1',
+  'Sx Lat 1-2-3',
+  'Dx Cent 2-1-3',
+  'Sx Cent 3-1-2',
 ];
 
-class DropdownTelaio extends StatefulWidget {
-  DropdownTelaio({super.key, required this.text, required this.stringa});
+String dropdownValue = "";
+
+class DropdownVerso extends StatefulWidget {
+  DropdownVerso({super.key, required this.text, required this.stringa});
 
   late String text;
   final String stringa;
-
   @override
-  State<DropdownTelaio> createState() => _DropdownTelaioState();
+  State<DropdownVerso> createState() => _DropdownVersoState();
 }
 
-class _DropdownTelaioState extends State<DropdownTelaio> {
+class _DropdownVersoState extends State<DropdownVerso> {
   String dropdownValue = "";
   @override
   Widget build(BuildContext context) {
     if (widget.text == "") {
-      if (widget.stringa == "tipoTelaioPersiane") {
-        dropdownValue = telaio.first;
-        tipoTelaioPersiane = dropdownValue;
-      } else if (widget.stringa == "tipoTelaioTapparelle") {
-        dropdownValue = telaio.first;
-        tipoTelaioTapparelle = dropdownValue;
+      if (widget.stringa == "tipoVersoPersiane") {
+        dropdownValue = versi.first;
+        tipoVersoPersiane = dropdownValue;
+      } else if (widget.stringa == "tipoVersoTapparelle") {
+        dropdownValue = versi.first;
+        tipoVersoTapparelle = dropdownValue;
       }
     } else {
       dropdownValue = widget.text;
     }
-    if (widget.stringa == "tipoTelaioPersiane") {
+    if (widget.stringa == "tipoVersoPersiane") {
       return DropdownButton(
         isExpanded: true,
         value: dropdownValue,
@@ -43,10 +46,10 @@ class _DropdownTelaioState extends State<DropdownTelaio> {
           setState(() {
             dropdownValue = value!;
           });
-          tipoTelaioPersiane = value!;
+          tipoVersoPersiane = value!;
           widget.text = value;
         },
-        items: telaio.map<DropdownMenuItem<String>>((String value) {
+        items: versi.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Row(
@@ -57,7 +60,7 @@ class _DropdownTelaioState extends State<DropdownTelaio> {
           );
         }).toList(),
       );
-    } else if (widget.stringa == "tipoTelaioTapparelle") {
+    } else if (widget.stringa == "tipoVersoTapparelle") {
       return DropdownButton(
         isExpanded: true,
         value: dropdownValue,
@@ -66,10 +69,10 @@ class _DropdownTelaioState extends State<DropdownTelaio> {
           setState(() {
             dropdownValue = value!;
           });
-          tipoTelaioTapparelle = value!;
+          tipoVersoTapparelle = value!;
           widget.text = value;
         },
-        items: telaio.map<DropdownMenuItem<String>>((String value) {
+        items: versi.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Row(

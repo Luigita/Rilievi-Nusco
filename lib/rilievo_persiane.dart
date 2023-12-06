@@ -20,10 +20,12 @@ import 'nuovo_database.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
-String tipoManigliaPersiane = "";
-String tipoFinituraPersiane = "";
-String modelloPersiane = "";
+String finituraInterna = "";
+String finituraEsterna = "";
+String modelloPersiana = "";
+String colorazionePersianaInt = "";
+String colorazionePersianaEst = "";
+String controtelaio = "";
 
 class RilievoPersiane extends StatefulWidget {
   const RilievoPersiane({super.key, required this.camera});
@@ -77,7 +79,7 @@ class InserimentoIntestazionePersianeState
   int? selectedId;
 
   List<TextEditingController> textController =
-      List.generate(8, (int i) => TextEditingController());
+      List.generate(14, (int i) => TextEditingController());
 
   final _formKey = GlobalKey<FormState>();
 
@@ -117,14 +119,14 @@ class InserimentoIntestazionePersianeState
                 TextField(
                   decoration: InputDecoration(
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_month),
-                        onPressed: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2019, 1),
-                            lastDate: DateTime(2099, 12),
-                          );
+                    icon: const Icon(Icons.calendar_month),
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2019, 1),
+                        lastDate: DateTime(2099, 12),
+                      );
                       if (pickedDate != null) {
                         //print(pickedDate.toLocal());  //pickedDate output format => 2021-03-10 00:00:00.000
                         String formattedDate =
@@ -149,30 +151,88 @@ class InserimentoIntestazionePersianeState
                   controller: textController[2],
                 ),
                 const Divider(),
-                const Text('Modello'),
-                Dropdown(variabile: modelloPersiane, stringa: "modelloPersiane", condizione: "modello"),
-                const Divider(),
-                const Text('Modello maniglia'),
-                Dropdown(variabile: tipoManigliaPersiane, stringa: "tipoManigliaPersiane", condizione: "maniglia"),
-                const Divider(),
-                const Text('Finitura interna'),
-                Dropdown(variabile: tipoFinituraPersiane, stringa: "tipoFinituraPersiane", condizione: "finitura"),
-                const Divider(),
-                const Text('Ferramenta'),
+                const Text('Tipologia Infisso'),
                 TextField(
                   scrollPadding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
                   textInputAction: TextInputAction.next,
-                  controller: textController[7],
+                  controller: textController[3],
                 ),
                 const Divider(),
-                const Text('Commerciale'),
+                const Text('Finitura Interna'),
+                Dropdown(
+                    variabile: finituraInterna,
+                    stringa: "finituraInterna",
+                    condizione: "finituraInterna"),
+                const Divider(),
+                const Text('Finitura Esterna'),
+                Dropdown(
+                    variabile: finituraEsterna,
+                    stringa: "finituraEsterna",
+                    condizione: "finituraEsterna"),
+                const Divider(),
+                const Text('Modello Persiana'),
+                Dropdown(
+                    variabile: modelloPersiana,
+                    stringa: "modelloPersiana",
+                    condizione: "modelloPersiana"),
+                const Divider(),
+                const Text('Colorazione Persiana Interna'),
+                Dropdown(
+                    variabile: colorazionePersianaInt,
+                    stringa: "colorazionePersianaInt",
+                    condizione: "colorazionePersianaInt"),
+                const Divider(),
+                const Text('Colorazione Persiana Esterna'),
+                Dropdown(
+                    variabile: colorazionePersianaEst,
+                    stringa: "colorazionePersianaEst",
+                    condizione: "colorazionePersianaEst"),
+                const Divider(),
+                const Text('Riferimento Larghezza'),
                 TextField(
                   scrollPadding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
                   textInputAction: TextInputAction.next,
-                  controller: textController[6],
+                  controller: textController[10],
                 ),
+                // Dropdown(variabile: riferimentoLarghezza, stringa: "riferimentoLarghezza", condizione: "riferimentoLarghezza"),
+                const Divider(),
+                const Text('Riferimento Altezza'),
+                TextField(
+                  scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  textInputAction: TextInputAction.next,
+                  controller: textController[11],
+                ),
+                // Dropdown(variabile: riferimentoAltezza, stringa: "riferimentoAltezza", condizione: "riferimentoAltezza"),
+                const Divider(),
+                const Text('Controtelaio'),
+                Dropdown(
+                    variabile: controtelaio,
+                    stringa: "controtelaio",
+                    condizione: "controtelaio"),
+                const Divider(),
+                const Text('Riferimento Larghezza Persiana'),
+                TextField(
+                  scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  textInputAction: TextInputAction.next,
+                  controller: textController[12],
+                ),
+                // Dropdown(variabile: riferimentoAltezza, stringa: "riferimentoAltezza", condizione: "riferimentoAltezza"),
+                const Divider(),
+                const Text('Riferimento Altezza Persiana'),
+                TextField(
+                  scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  textInputAction: TextInputAction.next,
+                  controller: textController[13],
+                ),
+                // Dropdown(variabile: riferimentoAltezza, stringa: "riferimentoAltezza", condizione: "riferimentoAltezza"),
+                const Divider(),
+
+                ///TODO: DA CONTINUARE
               ],
             ),
           ),
@@ -186,22 +246,34 @@ class InserimentoIntestazionePersianeState
                           cliente: textController[0].text,
                           destinazione: textController[1].text,
                           data: textController[2].text,
-                          modelloPorta: modelloPersiane,
-                          modelloManiglia: tipoManigliaPersiane,
-                          finituraInterna: tipoFinituraPersiane,
-                          commerciale: textController[6].text,
-                          ferramenta: textController[7].text,
+                          tipologiaInfisso: textController[3].text,
+                          finituraInfissoInt: finituraInterna,
+                          finituraInfissoEst: finituraEsterna,
+                          modelloPersiana: modelloPersiana,
+                          colorazionePersianaInt: colorazionePersianaInt,
+                          colorazionePersianaEst: colorazionePersianaEst,
+                          riferimentoAltezza: textController[11].text,
+                          riferimentoLarghezza: textController[10].text,
+                          controtelai: controtelaio,
+                          riferimentoLarghezzaPersiane: textController[12].text,
+                          riferimentoAltezzaPersiane: textController[13].text,
                         ),
                       )
                     : await DBHelper.instance.addPersiana(RilievoPersiana(
                         cliente: textController[0].text,
                         destinazione: textController[1].text,
                         data: textController[2].text,
-                        modelloPorta: modelloPersiane,
-                        modelloManiglia: tipoManigliaPersiane,
-                        finituraInterna: tipoFinituraPersiane,
-                        commerciale: textController[6].text,
-                        ferramenta: textController[7].text,
+                        tipologiaInfisso: textController[3].text,
+                        finituraInfissoInt: finituraInterna,
+                        finituraInfissoEst: finituraEsterna,
+                        modelloPersiana: modelloPersiana,
+                        colorazionePersianaInt: colorazionePersianaInt,
+                        colorazionePersianaEst: colorazionePersianaEst,
+                        riferimentoAltezza: textController[11].text,
+                        riferimentoLarghezza: textController[10].text,
+                        controtelai: controtelaio,
+                        riferimentoLarghezzaPersiane: textController[12].text,
+                        riferimentoAltezzaPersiane: textController[13].text,
                       ));
                 setState(() {
                   textController[0].clear();
@@ -212,6 +284,12 @@ class InserimentoIntestazionePersianeState
                   textController[5].clear();
                   textController[6].clear();
                   textController[7].clear();
+                  textController[8].clear();
+                  textController[9].clear();
+                  textController[10].clear();
+                  textController[11].clear();
+                  textController[12].clear();
+                  textController[13].clear();
                   selectedId = null;
                 });
                 Navigator.of(context).pop();

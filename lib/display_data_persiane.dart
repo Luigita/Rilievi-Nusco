@@ -5,6 +5,8 @@
 // import 'package:applicazione_prova/display_data_tapparelle.dart';
 // import 'package:applicazione_prova/rilievo_persiane.dart';
 // import 'package:applicazione_prova/rilievo_tapparelle.dart';
+import 'package:applicazione_prova/dropdown.dart';
+import 'package:applicazione_prova/dropdownVerso.dart';
 import 'package:applicazione_prova/dropdownVetro.dart';
 import 'package:applicazione_prova/nuovo_registratore.dart';
 import 'package:applicazione_prova/rilievo_persiane.dart';
@@ -27,7 +29,6 @@ String _riferimento = "";
 String _quantita = "0";
 String _larghezza = "0";
 String _altezza = "0";
-String tipoPersiane = "";
 String _dxsx = "";
 String _vetro = "";
 String _telaio = "";
@@ -35,10 +36,13 @@ String _larghezzaLuce = "0";
 String _altezzaLuce = "0";
 String _note = "";
 
+String tipoVersoPersiane = "";
+String tipoPersiane = "";
 String tipoProfiloPersiane = "";
 String tipoVetroPersiane = "";
 String tipoTelaioPersiane = "";
-
+///*******************************************************///
+///*******************************************************///
 class DisplayDataPersiana extends StatefulWidget {
   const DisplayDataPersiana({super.key, required this.camera});
 
@@ -76,7 +80,8 @@ class _DisplayDataState extends State<DisplayDataPersiana> {
               ? const Center(child: Text('Lista vuota'))
               : ListView(
                   children: snapshot.data!.map((rilievoPersiane) {
-                    DBHelper.instance.contaPosizioniPersiane("configurazionePersiane", rilievoPersiane);
+                  DBHelper.instance.contaPosizioniPersiane(
+                      "configurazionePersiane", rilievoPersiane);
                   return Card(
                     color: Colors.white70,
                     child: Slidable(
@@ -146,87 +151,95 @@ class _DisplayDataState extends State<DisplayDataPersiana> {
                           setState(() {});
                         }),
 
-                            // All actions are defined in the children parameter.
-                            children: const [
-                              // A SlidableAction can have an icon and/or a label.
-                              SlidableAction(
-                                onPressed: print,
-                                backgroundColor: Color(0xFFFE4A49),
-                                foregroundColor: Colors.white,
-                                icon: Icons.delete,
-                                label: 'Delete',
-                              ),
-                            ],
+                        // All actions are defined in the children parameter.
+                        children: const [
+                          // A SlidableAction can have an icon and/or a label.
+                          SlidableAction(
+                            onPressed: print,
+                            backgroundColor: Color(0xFFFE4A49),
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'Delete',
                           ),
-                          endActionPane: ActionPane(
-                            // A motion is a widget used to control how the pane animates.
-                            motion: const ScrollMotion(),
-                            // A pane can dismiss the Slidable.
-                            dismissible: DismissiblePane(onDismissed: () {
-                              setState(() {});
-                            }),
-                            // All actions are defined in the children parameter.
-                            children: const [
-                              // A SlidableAction can have an icon and/or a label.
-                              SlidableAction(
-                                // TODO: aggiungere modifica come per le singole posizioni
-                                onPressed: print,
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                                icon: Icons.edit,
-                                label: 'Modifica',
-                              ),
-                            ],
+                        ],
+                      ),
+                      endActionPane: ActionPane(
+                        // A motion is a widget used to control how the pane animates.
+                        motion: const ScrollMotion(),
+                        // A pane can dismiss the Slidable.
+                        dismissible: DismissiblePane(onDismissed: () {
+                          setState(() {});
+                        }),
+                        // All actions are defined in the children parameter.
+                        children: const [
+                          // A SlidableAction can have an icon and/or a label.
+                          SlidableAction(
+                            // TODO: aggiungere modifica come per le singole posizioni
+                            onPressed: print,
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            icon: Icons.edit,
+                            label: 'Modifica',
                           ),
-                          child: ListTile(
-                            onTap: () async {
-                              await Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => VisualizzaPosizioniPersiane(
-                                      camera: widget.camera,
-                                      parentId: rilievoPersiane.id)));
-                              setState(() {});
-                            },
-                            trailing: FutureBuilder<Widget>(
-                              future: numeroPosizioniPersiane(rilievoPersiane),
-                              builder: (context, snaposhot){
-                                if(snapshot.connectionState == ConnectionState.done){
-                                  return Text("${rilievoPersiane.posizioni} posizioni");
-                                }
-                                else if(snapshot.hasError){
-                                  throw snapshot.error!;
-                                }
-                                else{
-                                  return Center(child: CircularProgressIndicator());
-                                }
+                        ],
+                      ),
+                      child: ListTile(
+                        onTap: () async {
+                          await Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => VisualizzaPosizioniPersiane(
+                                  camera: widget.camera,
+                                  parentId: rilievoPersiane.id)));
+                          setState(() {});
+                        },
+                        trailing: FutureBuilder<Widget>(
+                            future: numeroPosizioniPersiane(rilievoPersiane),
+                            builder: (context, snaposhot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                return Text(
+                                    "${rilievoPersiane.posizioni} posizioni");
+                              } else if (snapshot.hasError) {
+                                throw snapshot.error!;
+                              } else {
+                                return CircularProgressIndicator();
                               }
+                            }),
+                        title: Text('${rilievoPersiane.cliente} '
+                            ' '
+                            '${rilievoPersiane.destinazione} '
+                            ' '
+                            '${rilievoPersiane.data}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${rilievoPersiane.tipologiaInfisso}'
+                                ' - ${rilievoPersiane.finituraInfissoInt}'
+                                ' - ${rilievoPersiane.modelloPersiana}'
+                                ' - ${rilievoPersiane.colorazionePersianaInt}'
+                                ' - ${rilievoPersiane.riferimentoLarghezza}'
+                                ' - ${rilievoPersiane.riferimentoAltezza}'
+                                ' - ${rilievoPersiane.controtelai}'
+                                ' - ${rilievoPersiane.guide}'
+                                ' - ${rilievoPersiane.coprifili}'
+                                ' - ${rilievoPersiane.angolari}'
+                                ' - ${rilievoPersiane.finituraMartellina}'
                             ),
-                            title: Text('${rilievoPersiane.cliente} '
-                                ' '
-                                '${rilievoPersiane.destinazione} '
-                                ' '
-                                '${rilievoPersiane.data}'),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('${rilievoPersiane.modelloPorta} '
-                                    ' '
-                                    '${rilievoPersiane.finituraInterna} '
-                                    ' '
-                                    '${rilievoPersiane.modelloManiglia} '
-                                    ' '
-                                    '${rilievoPersiane.ferramenta} '),
-                              ],
-                            ),
-                          ),
+                          ],
                         ),
-                      );
-                    }).toList());
+                      ),
+                    ),
+                  );
+                }).toList());
         },
       ),
     );
   }
 }
+///*******************************************************///
+///*******************************************************///
 
+///*******************************************************///
+///*******************************************************///
 class VisualizzaPosizioniPersiane extends StatefulWidget {
   VisualizzaPosizioniPersiane(
       {super.key, required this.parentId, required this.camera});
@@ -456,14 +469,23 @@ class _VisualizzaPosizioniPersianeState
                                             await Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        SoundRecorder(configurazione: configurazionePersiana, tipoConfigurazione: "persiane")
-                                                        // RegistraAudio(
-                                                        //   configurazione:
-                                                        //       configurazionePersiana,
-                                                        //   tipoConfigurazione:
-                                                        //       'persiane',
-                                                        // )));
-                                                        ));
+                                                        SoundRecorder(
+                                                            configurazione:
+                                                                configurazionePersiana,
+                                                            tipoConfigurazione:
+                                                                "persiane")
+                                                    // RegistraAudio(
+                                                    //   configurazione:
+                                                    //       configurazionePersiana,
+                                                    //   tipoConfigurazione:
+                                                    //       'persiane',
+                                                    // )));
+                                                    ));
+                                          } else {
+                                            //TODO: NON FUNZIONA
+                                            (const SnackBar(
+                                                content: Text(
+                                                    "Scattare prima una foto per registrare l'audio")));
                                           }
                                         },
                                         child:
@@ -475,6 +497,7 @@ class _VisualizzaPosizioniPersianeState
                                 ),
                               ),
                             )
+
                           /// TODO: mette un widget vuoto, da cambiare
                           : const SizedBox.shrink(),
                     );
@@ -485,7 +508,11 @@ class _VisualizzaPosizioniPersianeState
     );
   }
 }
+///*******************************************************///
+///*******************************************************///
 
+///*******************************************************///
+///*******************************************************///
 class ConfigurazionePersiane extends StatefulWidget {
   ConfigurazionePersiane(
       {super.key, required this.parentId, this.configurazionePersiane});
@@ -501,11 +528,15 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
     with WidgetsBindingObserver {
   int? selectedId;
 
+  refresh() {
+    setState(() {});
+  }
+
   final List<bool> _numberInputIsValid = List.filled(5, true);
 
   List<FocusNode> focusNodeList = List.generate(5, (_) => FocusNode());
 
-  //DA MODIFICARE PER FARE PIU DI DUE TEXTFIELD//
+  ///DA MODIFICARE PER FARE PIU DI DUE TEXTFIELD///
   List<TextEditingController> textController =
       List.generate(11, (int i) => TextEditingController());
 
@@ -548,7 +579,6 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
   final _formKey = GlobalKey<FormState>();
 
   bool shouldPop = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -562,9 +592,28 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
         },
         child: Scaffold(
           //resizeToAvoidBottomInset: true,
-          appBar: AppBar(
-            title: const Text('Configurazione persiana'),
-          ),
+          appBar:
+              AppBar(title: const Text('Configurazione persiana'), actions: [
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("ANNULLA",
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16))),
+            // FloatingActionButton(
+            //   backgroundColor: Colors.red,
+            //   //mini: true,
+            //   onPressed: () async {
+            //     Navigator.of(context).pop();
+            //   },
+            //   child: const Text("ANNULLA"))],
+          ]),
           body: Form(
             key: _formKey,
             child: ListView(
@@ -626,10 +675,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   decoration: InputDecoration(
                     errorText: _numberInputIsValid[1]
                         ? null
-                        : "Inserisci un numero (es. 10.5)",
+                        : "Inserisci un intero (es. 10)",
                   ),
                   onChanged: (String val) {
-                    final v = double.tryParse(val);
+                    final v = int.tryParse(val);
                     if (v == null) {
                       setState(() {
                         _numberInputIsValid[1] = false;
@@ -647,10 +696,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null ||
-                        double.tryParse(value) == null ||
+                        int.tryParse(value) == null ||
                         value.isEmpty) {
                       focusNodeList[1].requestFocus();
-                      return 'Inserire un valore corretto es: 10.2';
+                      return 'Inserire un valore corretto es: 10';
                     }
                     return null;
                   },
@@ -665,10 +714,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   decoration: InputDecoration(
                     errorText: _numberInputIsValid[2]
                         ? null
-                        : "Inserisci un numero (es. 10.5)",
+                        : "Inserisci un intero (es. 10)",
                   ),
                   onChanged: (String val) {
-                    final v = double.tryParse(val);
+                    final v = int.tryParse(val);
                     if (v == null) {
                       setState(() {
                         _numberInputIsValid[2] = false;
@@ -686,10 +735,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null ||
-                        double.tryParse(value) == null ||
+                        int.tryParse(value) == null ||
                         value.isEmpty) {
                       focusNodeList[2].requestFocus();
-                      return 'Inserire un valore corretto es: 10.2';
+                      return 'Inserire un valore corretto es: 10';
                     }
                     return null;
                   },
@@ -697,11 +746,18 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                 ),
                 const Divider(),
                 const Text('Tipo'),
-                TendinaTipologia(text: tipoPersiane, stringa: "tipoPersiane"),
+                TendinaTipologia(
+                  text: tipoPersiane,
+                  stringa: "tipoPersiane",
+                  notifyParent: refresh,
+                ),
                 const Divider(),
                 const Text('Profilo'),
                 TendinaTipologia(
-                    text: tipoProfiloPersiane, stringa: "tipoProfiloPersiane"),
+                  text: tipoProfiloPersiane,
+                  stringa: "tipoProfiloPersiane",
+                  notifyParent: refresh,
+                ),
                 // TextField(
                 //   scrollPadding: EdgeInsets.only(
                 //       bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -710,31 +766,30 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                 // ),
                 const Divider(),
                 const Text('DX/SX'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          textController[5].text = "Dx";
-                        },
-                        child: const Text("DX")),
-                    ElevatedButton(
-                        onPressed: () {
-                          textController[5].text = "Sx";
-                        },
-                        child: const Text("SX"))
-                  ],
-                ),
-                TextField(
-                  enabled: false,
-                  scrollPadding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  textInputAction: TextInputAction.next,
-                  controller: textController[5],
-                ),
+                DropdownVerso(
+                    text: tipoVersoPersiane, stringa: "tipoVersoPersiane"),
+                //Due button dx e sx, quando si preme uno viene visualizzata la stringa e salvato il valore del button
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     ElevatedButton(
+                //         onPressed: () {
+                //           textController[5].text = "Dx";
+                //         },
+                //         child: const Text("DX")),
+                //     ElevatedButton(
+                //         onPressed: () {
+                //           textController[5].text = "Sx";
+                //         },
+                //         child: const Text("SX"))
+                //   ],
+                // ),
                 const Divider(),
                 const Text('Vetro'),
-                DropdownVetro(text: tipoVetroPersiane, stringa: "tipoVetroPersiane"),
+                DropdownVetro(
+                    text: tipoVetroPersiane,
+                    stringa: "tipoVetroPersiane",
+                    tipoFinestra: tipoPersiane),
                 // TextField(
                 //   scrollPadding: EdgeInsets.only(
                 //       bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -743,7 +798,8 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                 // ),
                 const Divider(),
                 const Text('Telaio'),
-                DropdownTelaio(text: tipoTelaioPersiane, stringa: "tipoTelaioPersiane"),
+                DropdownTelaio(
+                    text: tipoTelaioPersiane, stringa: "tipoTelaioPersiane"),
                 const Divider(),
                 const Text('Larghezza luce'),
                 TextFormField(
@@ -753,10 +809,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   decoration: InputDecoration(
                     errorText: _numberInputIsValid[3]
                         ? null
-                        : "Inserisci un numero (es. 10.5)",
+                        : "Inserisci un intero (es. 10)",
                   ),
                   onChanged: (String val) {
-                    final v = double.tryParse(val);
+                    final v = int.tryParse(val);
                     if (v == null) {
                       setState(() {
                         _numberInputIsValid[3] = false;
@@ -774,10 +830,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null ||
-                        double.tryParse(value) == null ||
+                        int.tryParse(value) == null ||
                         value.isEmpty) {
                       focusNodeList[3].requestFocus();
-                      return 'Inserire un valore corretto es: 10.2';
+                      return 'Inserire un valore corretto es: 10';
                     }
                     return null;
                   },
@@ -792,10 +848,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   decoration: InputDecoration(
                     errorText: _numberInputIsValid[4]
                         ? null
-                        : "Inserisci un numero (es. 10.5)",
+                        : "Inserisci un intero (es. 10)",
                   ),
                   onChanged: (String val) {
-                    final v = double.tryParse(val);
+                    final v = int.tryParse(val);
                     if (v == null) {
                       setState(() {
                         _numberInputIsValid[4] = false;
@@ -813,10 +869,10 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null ||
-                        double.tryParse(value) == null ||
+                        int.tryParse(value) == null ||
                         value.isEmpty) {
                       focusNodeList[4].requestFocus();
-                      return 'Inserire un valore corretto es: 10.2';
+                      return 'Inserire un valore corretto es: 10';
                     }
                     return null;
                   },
@@ -836,13 +892,6 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FloatingActionButton(
-                  backgroundColor: Colors.red,
-                  mini: true,
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Icon(Icons.cancel, size: 25)),
-              FloatingActionButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     selectedId != null
@@ -851,16 +900,16 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                                 id: selectedId,
                                 riferimento: textController[0].text,
                                 quantita: int.parse(textController[1].text),
-                                larghezza: double.parse(textController[2].text),
-                                altezza: double.parse(textController[3].text),
+                                larghezza: int.parse(textController[2].text),
+                                altezza: int.parse(textController[3].text),
                                 tipo: "$tipoPersiane-$tipoProfiloPersiane",
-                                dxsx: textController[5].text,
+                                dxsx: tipoVersoPersiane,
                                 vetro: tipoVetroPersiane,
                                 telaio: tipoTelaioPersiane,
                                 larghezzaLuce:
-                                    double.parse(textController[8].text),
+                                    int.parse(textController[8].text),
                                 altezzaLuce:
-                                    double.parse(textController[9].text),
+                                    int.parse(textController[9].text),
                                 note: textController[10].text,
                                 idParente: widget.parentId,
                                 disegno: widget.configurazionePersiane?.disegno,
@@ -870,15 +919,15 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                             Configurazione(
                               riferimento: textController[0].text,
                               quantita: int.parse(textController[1].text),
-                              larghezza: double.parse(textController[2].text),
-                              altezza: double.parse(textController[3].text),
+                              larghezza: int.parse(textController[2].text),
+                              altezza: int.parse(textController[3].text),
                               tipo: "$tipoPersiane-$tipoProfiloPersiane",
-                              dxsx: textController[5].text,
+                              dxsx: tipoVersoPersiane,
                               vetro: tipoVetroPersiane,
                               telaio: tipoTelaioPersiane,
                               larghezzaLuce:
-                                  double.parse(textController[8].text),
-                              altezzaLuce: double.parse(textController[9].text),
+                                  int.parse(textController[8].text),
+                              altezzaLuce: int.parse(textController[9].text),
                               note: textController[10].text,
                               idParente: widget.parentId,
                             ),
@@ -889,7 +938,7 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
                       _larghezza = textController[2].text;
                       _altezza = textController[3].text;
                       //tipoPersiane = textController[4].text;
-                      _dxsx = textController[5].text;
+                      // _dxsx = textController[5].text;
                       //_vetro = textController[6].text;
                       //_telaio = textController[7].text;
                       _larghezzaLuce = textController[8].text;
@@ -923,10 +972,11 @@ class _ConfigurazionePersianeState extends State<ConfigurazionePersiane>
     ));
   }
 }
+///*******************************************************///
+///*******************************************************///
 Future<Widget> numeroPosizioniPersiane(RilievoPersiana rilievoPersiane) async {
-
-  await DBHelper.instance.contaPosizioniPersiane("configurazionePersiane", rilievoPersiane);
+  await DBHelper.instance
+      .contaPosizioniPersiane("configurazionePersiane", rilievoPersiane);
 
   return Text("${rilievoPersiane.posizioni} posizioni");
-
 }

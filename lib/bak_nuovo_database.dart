@@ -117,75 +117,33 @@ class RilievoPersiana {
   String? cliente;
   String? destinazione;
   String? data;
-  String? tipologiaInfisso;
-  String? finituraInfissoInt;
-  String? finituraInfissoEst;
-  String? modelloPersiana;
-  String? colorazionePersianaInt;
-  String? colorazionePersianaEst;
-  String? riferimentoLarghezza;
-  String? riferimentoAltezza;
-  String? controtelai;
-  String? riferimentoLarghezzaPersiane;
-  String? riferimentoAltezzaPersiane;
-  String? guide;
-  String? coprifili;
-  String? angolari;
-  String? finituraMartellina;
-  String? responsabile;
+  String? modelloPorta;
+  String? modelloManiglia;
+  String? finituraInterna;
+  String? commerciale;
+  String? ferramenta;
 
-  // String? modelloPorta;
-  // String? modelloManiglia;
-  // String? finituraInterna;
-  // String? commerciale;
-  // String? ferramenta;
-
-  RilievoPersiana({
-    this.id,
-    this.cliente,
-    this.destinazione,
-    this.data,
-    this.tipologiaInfisso,
-    this.finituraInfissoInt,
-    this.finituraInfissoEst,
-    this.modelloPersiana,
-    this.colorazionePersianaInt,
-    this.colorazionePersianaEst,
-    this.riferimentoLarghezza,
-    this.riferimentoAltezza,
-    this.controtelai,
-    this.riferimentoLarghezzaPersiane,
-    this.riferimentoAltezzaPersiane,
-    this.guide,
-    this.coprifili,
-    this.angolari,
-    this.finituraMartellina,
-    this.responsabile,
-  });
+  RilievoPersiana(
+      {this.id,
+      this.cliente,
+      this.destinazione,
+      this.data,
+      this.modelloPorta,
+      this.modelloManiglia,
+      this.finituraInterna,
+      this.commerciale,
+      this.ferramenta});
 
   factory RilievoPersiana.fromMap(Map<String, dynamic> json) => RilievoPersiana(
         id: json['id'],
         cliente: json['cliente'].toString(),
         destinazione: json['destinazione'].toString(),
         data: json['data'].toString(),
-        tipologiaInfisso: json['tipologiaInfisso'].toString(),
-        finituraInfissoInt: json['finituraInfissoInt'].toString(),
-        finituraInfissoEst: json['finituraInfissoEst'].toString(),
-        modelloPersiana: json['modelloPersiana'].toString(),
-        colorazionePersianaInt: json['colorazionePersianaInt'].toString(),
-        colorazionePersianaEst: json['colorazionePersianaEst'].toString(),
-        riferimentoLarghezza: json['riferimentoLarghezza'].toString(),
-        riferimentoAltezza: json['riferimentoAltezza'].toString(),
-        controtelai: json['controtelai'].toString(),
-        riferimentoLarghezzaPersiane:
-            json['riferimentoLarghezzaPersiane'].toString(),
-        riferimentoAltezzaPersiane:
-            json['riferimentoAltezzaPersiane'].toString(),
-        guide: json['guide'].toString(),
-        coprifili: json['coprifili'].toString(),
-        angolari: json['angolari'].toString(),
-        finituraMartellina: json['finituraMartellina'].toString(),
-        responsabile: json['responsabile'].toString(),
+        modelloPorta: json['modelloPorta'].toString(),
+        modelloManiglia: json['modelloManiglia'].toString(),
+        finituraInterna: json['finituraInterna'].toString(),
+        commerciale: json['commerciale'].toString(),
+        ferramenta: json['ferramenta'].toString(),
       );
 
   Map<String, dynamic> toMap() {
@@ -194,22 +152,11 @@ class RilievoPersiana {
       'cliente': cliente,
       'destinazione': destinazione,
       'data': data,
-      'tipologiaInfisso': tipologiaInfisso,
-      'finituraInfissoEst': finituraInfissoEst,
-      'finituraInfissoInt': finituraInfissoInt,
-      'modelloPersiana': modelloPersiana,
-      'colorazionePersianaInt': colorazionePersianaInt,
-      'colorazionePersianaEst': colorazionePersianaEst,
-      'riferimentoLarghezza': riferimentoLarghezza,
-      'riferimentoAltezza': riferimentoAltezza,
-      'controtelai': controtelai,
-      'riferimentoLarghezzaPersiane': riferimentoLarghezzaPersiane,
-      'riferimentoAltezzaPersiane': riferimentoAltezzaPersiane,
-      'guide': guide,
-      'coprifili': coprifili,
-      'angolari': angolari,
-      'finituraMartellina': finituraMartellina,
-      'responsabile': responsabile,
+      'modelloPorta': modelloPorta,
+      'modelloManiglia': modelloManiglia,
+      'finituraInterna': finituraInterna,
+      'commerciale': commerciale,
+      'ferramenta': ferramenta,
     };
   }
 
@@ -218,55 +165,20 @@ class RilievoPersiana {
         cliente = mappaRilievoTapparelle['cliente'],
         destinazione = mappaRilievoTapparelle['destinazione'],
         data = mappaRilievoTapparelle['data'],
-        tipologiaInfisso = mappaRilievoTapparelle['tipologiaInfisso'],
-        finituraInfissoInt = mappaRilievoTapparelle['finituraInfissoInt'],
-        finituraInfissoEst = mappaRilievoTapparelle['finituraInfissoEst'],
-        modelloPersiana = mappaRilievoTapparelle['modelloPersiana'],
-        colorazionePersianaInt =
-            mappaRilievoTapparelle['colorazionePersianaInt'],
-        colorazionePersianaEst =
-            mappaRilievoTapparelle['colorazionePersianaEst'],
-        riferimentoLarghezza = mappaRilievoTapparelle['riferimentoLarghezza'],
-        riferimentoAltezza = mappaRilievoTapparelle['riferimentoAltezza'],
-        controtelai = mappaRilievoTapparelle['controtelai'],
-        riferimentoLarghezzaPersiane =
-            mappaRilievoTapparelle['riferimentoLarghezzaPersiane'],
-        riferimentoAltezzaPersiane =
-            mappaRilievoTapparelle['riferimentoAltezzaPersiane'],
-        guide = mappaRilievoTapparelle['guide'],
-        coprifili = mappaRilievoTapparelle['coprifili'],
-        angolari = mappaRilievoTapparelle['angolari'],
-        finituraMartellina = mappaRilievoTapparelle['finituraMartellina'],
-        responsabile = mappaRilievoTapparelle['responsabile'];
+        modelloPorta = mappaRilievoTapparelle['modelloPorta'],
+        modelloManiglia = mappaRilievoTapparelle['modelloManiglia'],
+        finituraInterna = mappaRilievoTapparelle['finituraInterna'],
+        commerciale = mappaRilievoTapparelle['commerciale'],
+        ferramenta = mappaRilievoTapparelle['ferramenta'];
 
   @override
   String toString() {
-    return 'RilievoPersiane {'
-        'id: $id, '
-        'cliente: $cliente, '
-        'destinazione: $destinazione, '
-        'data: $data, '
-        'tipologiaInfisso: $tipologiaInfisso, '
-        'finituraInfissoInt: $finituraInfissoInt, '
-        'finituraInfissoEst: $finituraInfissoEst, '
-        'modelloPersiana: $modelloPersiana, '
-        'colorazionePersianaInt: $colorazionePersianaInt, '
-        'colorazionePersianaEst: $colorazionePersianaEst, '
-        'riferimentoLarghezza: $riferimentoLarghezza, '
-        'riferimentoAltezza: $riferimentoAltezza, '
-        'controtelai: $controtelai, '
-        'riferimentoLarghezzaPersiane: $riferimentoLarghezzaPersiane, '
-        'riferimentoAltezzaPersiane: $riferimentoAltezzaPersiane, '
-        'guide: $guide, '
-        'coprifili: $coprifili, '
-        'angolari: $angolari, '
-        'finituraMartellina: $finituraMartellina, '
-        'responsabile: $responsabile'
-        '}';
+    return 'RilievoPersiane {id: $id, cliente: $cliente, destinazione: $destinazione, data: $data, modelloPorta: $modelloPorta, modelloManiglia: $modelloManiglia, finituraInterna: $finituraInterna, commerciale: $commerciale, ferramenta: $ferramenta}';
   }
 }
 
 class Configurazione {
+
   @required
   final int? id;
   String? riferimento;
@@ -387,23 +299,21 @@ class Configurazione {
   }
 
   List<String> toStringFormatted() {
-    return [
-      ("Riferimento: $riferimento \n"),
-      ("Quantita: $quantita \n"),
-      ("Larghezza: $larghezza \n"),
-      ("Altezza: $altezza \n"),
-      ("Tipo: $tipo \n"),
-      ("Verso: $dxsx \n"),
-      ("Vetro: $vetro \n"),
-      ("Telaio: $telaio \n"),
-      ("Larghezza luce: $larghezzaLuce \n"),
-      ("Altezza luce: $altezzaLuce \n"),
-      ("Larghezza cassonetto: $larghezzaCassonetto \n"),
-      ("Altezza cassonetto: $altezzaCassonetto \n"),
-      ("Spessore cassonetto: $spessoreCassonetto \n"),
-      ("Profondita cielino: $profonditaCielino \n"),
-      ("Note: $note")
-    ];
+    return [("Riferimento: $riferimento \n"),
+        ("Quantita: $quantita \n"),
+        ("Larghezza: $larghezza \n"),
+        ("Altezza: $altezza \n"),
+        ("Tipo: $tipo \n"),
+        ("Verso: $dxsx \n"),
+        ("Vetro: $vetro \n"),
+        ("Telaio: $telaio \n"),
+        ("Larghezza luce: $larghezzaLuce \n"),
+        ("Altezza luce: $altezzaLuce \n"),
+        ("Larghezza cassonetto: $larghezzaCassonetto \n"),
+        ("Altezza cassonetto: $altezzaCassonetto \n"),
+        ("Spessore cassonetto: $spessoreCassonetto \n"),
+        ("Profondita cielino: $profonditaCielino \n"),
+        ("Note: $note")];
   }
 }
 
@@ -447,7 +357,6 @@ class DBHelper {
         coloreTapparella STRING
       )
       ''');
-
     /// configurazione tapparelle ///
     await db.execute('''
       CREATE TABLE configurazioneTapparelle(
@@ -473,7 +382,6 @@ class DBHelper {
         blob STRING
       )
       ''');
-
     /// testata persiane ///
     await db.execute('''
       CREATE TABLE persiane(
@@ -481,25 +389,13 @@ class DBHelper {
         cliente STRING,
         destinazione STRING,
         data STRING,
-        tipologiaInfisso STRING,
-        finituraInfissoInt STRING,
-        finituraInfissoEst STRING,
-        modelloPersiana STRING,
-        colorazionePersianaInt STRING,
-        colorazionePersianaEst STRING,
-        riferimentoLarghezza STRING,
-        riferimentoAltezza STRING,
-        controtelai STRING,
-        riferimentoLarghezzaPersiane STRING,
-        riferimentoAltezzaPersiane STRING,
-        guide STRING,
-        coprifili STRING,
-        angolari STRING,
-        finituraMartellina STRING,
-        responsabile STRING
+        modelloPorta STRING,
+        modelloManiglia STRING,
+        finituraInterna STRING,
+        commerciale STRING,
+        ferramenta STRING
       )
       ''');
-
     /// configurazione persiane ///
     await db.execute('''
       CREATE TABLE configurazionePersiane(
@@ -580,7 +476,9 @@ class DBHelper {
 
     encoder.close();
 
-    Share.shareXFiles([XFile(zipDatabasePath)]);
+    Share.shareXFiles([
+      XFile(zipDatabasePath)
+    ]);
 
     List<String> paths = [
       '$path/persiane.csv',
@@ -783,20 +681,15 @@ class DBHelper {
         await db.rawQuery('SELECT COUNT(*) FROM $tableName'));
     return (count);
   }
-
-  Future<int> contaPosizioniPersiane(
-      String tableName, RilievoPersiana rilievoPersiana) async {
+  
+  Future<int> contaPosizioniPersiane(String tableName, RilievoPersiana rilievoPersiana) async {
     Database db = await instance.database;
-    var result =
-        await db.query(tableName, where: 'idParente = ${rilievoPersiana.id}');
+    var result = await db.query(tableName, where: 'idParente = ${rilievoPersiana.id}');
     return rilievoPersiana.posizioni = result.length;
   }
-
-  Future<int> contaPosizioniTapparelle(
-      String tableName, RilievoTapparella rilievoTapparelle) async {
+  Future<int> contaPosizioniTapparelle(String tableName, RilievoTapparella rilievoTapparelle) async {
     Database db = await instance.database;
-    var result =
-        await db.query(tableName, where: 'idParente = ${rilievoTapparelle.id}');
+    var result = await db.query(tableName, where: 'idParente = ${rilievoTapparelle.id}');
     return rilievoTapparelle.posizioni = result.length;
   }
 }

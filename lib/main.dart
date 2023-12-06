@@ -40,11 +40,10 @@ Future main() async {
 
   runApp(MaterialApp(
 
-    //TODO: CREARE ROUTES E PROVARE A FARE NAVIGATOR PUSH E POP CON I NOMI DELLE ROUTES Navigator.popUntil(context, ModalRoute.withName('/scrren'));
-
     title: 'Rilievi Nusco',
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      //elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: Colors.blue)),
       useMaterial3: true,
     ),
     home: SelezionaModulo(camera: firstCamera),
@@ -260,9 +259,7 @@ class _SelezionaModuloState extends State<SelezionaModulo> {
                           builder: (context) => RilievoTapparelle(
                                 camera: widget.camera,
                               )));
-                      setState(() {
-
-                      });
+                      setState(() {});
                     }
                     ///*************************///
                 )

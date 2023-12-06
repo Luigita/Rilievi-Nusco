@@ -2,34 +2,36 @@ import 'package:applicazione_prova/display_data_persiane.dart';
 import 'package:applicazione_prova/display_data_tapparelle.dart';
 import 'package:flutter/material.dart';
 
-const List<String> vetri = <String>['vetro 1', 'vetro 2', 'vetro 3', 'vetro 4'];
+const List<String> vetriFin = <String>[
+  'Vetro finestra',
+  'Vetro sabbiato finestra',
+
+];
+const List<String> vetriPfin = <String>[
+  'Vetro portafinestra',
+  'Vetro sabbiato portafinestra',
+];
+
+late List<String> vetri;
+String dropdownValue = "";
 
 class DropdownVetro extends StatefulWidget {
-  DropdownVetro({super.key, required this.text, required this.stringa});
+
+  DropdownVetro({super.key, required this.text, required this.stringa, required this.tipoFinestra});
 
   late String text;
   final String stringa;
-
+  final String tipoFinestra;
   @override
   State<DropdownVetro> createState() => _DropdownVetroState();
 }
-
 class _DropdownVetroState extends State<DropdownVetro> {
-  String dropdownValue = "";
+
   @override
   Widget build(BuildContext context) {
-    if (widget.text == "") {
-      if (widget.stringa == "tipoVetroPersiane") {
-        dropdownValue = vetri.first;
-        tipoVetroPersiane = dropdownValue;
-      } else if (widget.stringa == "tipoVetroTapparelle") {
-        dropdownValue = vetri.first;
-        tipoVetroTapparelle = dropdownValue;
-      }
-    } else {
-      dropdownValue = widget.text;
-    }
+
     if (widget.stringa == "tipoVetroPersiane") {
+      vetri = listaVetri(widget.text, widget.stringa, widget.tipoFinestra);
       return DropdownButton(
         isExpanded: true,
         value: dropdownValue,
@@ -42,6 +44,7 @@ class _DropdownVetroState extends State<DropdownVetro> {
           widget.text = value;
         },
         items: vetri.map<DropdownMenuItem<String>>((String value) {
+          tipoVetroPersiane = dropdownValue;
           return DropdownMenuItem<String>(
             value: value,
             child: Row(
@@ -53,6 +56,7 @@ class _DropdownVetroState extends State<DropdownVetro> {
         }).toList(),
       );
     } else if (widget.stringa == "tipoVetroTapparelle") {
+      vetri = listaVetri(widget.text, widget.stringa, widget.tipoFinestra);
       return DropdownButton(
         isExpanded: true,
         value: dropdownValue,
@@ -65,6 +69,7 @@ class _DropdownVetroState extends State<DropdownVetro> {
           widget.text = value;
         },
         items: vetri.map<DropdownMenuItem<String>>((String value) {
+          tipoVetroTapparelle = dropdownValue;
           return DropdownMenuItem<String>(
             value: value,
             child: Row(
@@ -79,4 +84,48 @@ class _DropdownVetroState extends State<DropdownVetro> {
       throw Exception("Parametro non corretto");
     }
   }
+}
+
+List<String> listaVetri(String text, String stringa, String tipoFinestra){
+  if (text == "") {
+    if (stringa == "tipoVetroPersiane") {
+      if (tipoFinestra.startsWith('F') || tipoFinestra == "") {
+        dropdownValue = vetriFin.first;
+        tipoVetroPersiane = dropdownValue;
+        return vetriFin;
+      } else {
+        dropdownValue = vetriPfin.first;
+        tipoVetroPersiane = dropdownValue;
+        return vetriPfin;
+      }
+    }
+    else if (stringa == "tipoVetroTapparelle") {
+      if (tipoFinestra.startsWith('F') || tipoFinestra == "") {
+        dropdownValue = vetriFin.first;
+        tipoVetroTapparelle = dropdownValue;
+        return vetriFin;
+      } else {
+        dropdownValue = vetriPfin.first;
+        tipoVetroTapparelle = dropdownValue;
+        return vetriPfin;
+      }
+    }
+  } else {
+    if (tipoFinestra.startsWith("F")) {
+      if (vetriFin.contains(text)) {
+        dropdownValue = text;
+      } else {
+        dropdownValue = vetriFin.first;
+      }
+      return vetriFin;
+    } else {
+      if (vetriPfin.contains(text)) {
+        dropdownValue = text;
+      } else {
+        dropdownValue = vetriPfin.first;
+      }
+      return vetriPfin;
+    }
+  }
+  throw Exception();
 }

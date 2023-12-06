@@ -5,6 +5,7 @@
 // import 'package:applicazione_prova/rilievo_persiane.dart';
 // import 'package:applicazione_prova/rilievo_tapparelle.dart';
 import 'package:applicazione_prova/dropdownTelaio.dart';
+import 'package:applicazione_prova/dropdownVerso.dart';
 import 'package:applicazione_prova/registratore_audio.dart';
 import 'package:applicazione_prova/tendinaTipologia.dart';
 import 'package:camera/camera.dart';
@@ -37,10 +38,9 @@ String _spessoreCassonetto = "0";
 String _profonditaCielino = "0";
 String _note = "";
 
+String tipoVersoTapparelle = "";
 String tipoProfiloTapparelle = "";
-
 String tipoVetroTapparelle = "";
-
 String tipoTelaioTapparelle = "";
 
 class DisplayDataTapparella extends StatefulWidget {
@@ -190,19 +190,19 @@ class _DisplayDataState extends State<DisplayDataTapparella> {
                             setState(() {});
                           },
                           trailing: FutureBuilder<Widget>(
-                              future: numeroPosizioniTapparelle(rilievoTapparelle),
-                              builder: (context, snaposhot){
-                                if(snapshot.connectionState == ConnectionState.done){
-                                  return Text("${rilievoTapparelle.posizioni} posizioni");
-                                }
-                                else if(snapshot.hasError){
+                              future:
+                                  numeroPosizioniTapparelle(rilievoTapparelle),
+                              builder: (context, snaposhot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return Text(
+                                      "${rilievoTapparelle.posizioni} posizioni");
+                                } else if (snapshot.hasError) {
                                   throw snapshot.error!;
+                                } else {
+                                  return CircularProgressIndicator();
                                 }
-                                else{
-                                  return Center(child: CircularProgressIndicator());
-                                }
-                              }
-                          ),
+                              }),
                           title: Text('${rilievoTapparelle.cantiere} '
                               ' '
                               '${rilievoTapparelle.cliente} '
@@ -210,27 +210,17 @@ class _DisplayDataState extends State<DisplayDataTapparella> {
                               '${rilievoTapparelle.data}'),
                           subtitle: Column(
                             children: [
-                              Text('${rilievoTapparelle.tipologiaInfisso} '
-                                  ' '
-                                  '${rilievoTapparelle.guide} '
-                                  ' '
-                                  '${rilievoTapparelle.colorazioneInt} '
-                                  ' '
-                                  '${rilievoTapparelle.colorazioneEst} '
-                                  ' '
-                                  '${rilievoTapparelle.listelliInt} '
-                                  ' '
-                                  '${rilievoTapparelle.listelliEst}'
-                                  ' '
-                                  '${rilievoTapparelle.larghezzaInfissi}'
-                                  ' '
-                                  '${rilievoTapparelle.altezzaInfissi}'
-                                  ' '
-                                  '${rilievoTapparelle.misureLuce}'
-                                  ' '
-                                  '${rilievoTapparelle.tipoTapparella}'
-                                  ' '
-                                  '${rilievoTapparelle.coloreTapparella}'),
+                              Text('${rilievoTapparelle.tipologiaInfisso}'
+                                  ' - ${rilievoTapparelle.guide}'
+                                  ' - ${rilievoTapparelle.colorazioneInt}'
+                                  ' - ${rilievoTapparelle.colorazioneEst}'
+                                  ' - ${rilievoTapparelle.listelliInt}'
+                                  ' - ${rilievoTapparelle.listelliEst}'
+                                  ' - ${rilievoTapparelle.larghezzaInfissi}'
+                                  ' - ${rilievoTapparelle.altezzaInfissi}'
+                                  ' - ${rilievoTapparelle.misureLuce}'
+                                  ' - ${rilievoTapparelle.tipoTapparella}'
+                                  ' - ${rilievoTapparelle.coloreTapparella}'),
                             ],
                           ),
                         ),
@@ -380,7 +370,7 @@ class _VisualizzaPosizioniTapparelleState
                               ),
                               child: ListTile(
                                 title: Text(
-                                    '${configurazioneTapparella.riferimento}'),
+                                    '${configurazioneTapparella.riferimento} ${configurazioneTapparella.tipo}'),
                                 subtitle: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -459,6 +449,7 @@ class _VisualizzaPosizioniTapparelleState
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ConfigurazioneTapparelle(
+                                                      ///TODO: va in null error a volte
                                                       parentId: widget.parentId,
                                                       configurazioneTapparelle:
                                                           configurazioneTapparella,
@@ -479,21 +470,30 @@ class _VisualizzaPosizioniTapparelleState
                                             await Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        SoundRecorder(configurazione: configurazioneTapparella, tipoConfigurazione: "tapparelle")
-                                                  // RegistraAudio(
-                                                  //   configurazione:
-                                                  //       configurazionePersiana,
-                                                  //   tipoConfigurazione:
-                                                  //       'persiane',
-                                                  // )));
-                                                ));
+                                                        SoundRecorder(
+                                                            configurazione:
+                                                                configurazioneTapparella,
+                                                            tipoConfigurazione:
+                                                                "tapparelle")
+                                                    // RegistraAudio(
+                                                    //   configurazione:
+                                                    //       configurazionePersiana,
+                                                    //   tipoConfigurazione:
+                                                    //       'persiane',
+                                                    // )));
+                                                    ));
+                                          } else {
+                                            //TODO: NON FUNZIONA
+                                            (const SnackBar(
+                                                content: Text(
+                                                    "Scattare prima una foto per registrare l'audio")));
                                           }
                                         },
-                                        child:
-                                        configurazioneTapparella.blob != null
+                                        child: configurazioneTapparella.blob !=
+                                                null
                                             ? const Icon(Icons.mic)
                                             : const Icon(Icons.mic,
-                                            color: Colors.red)),
+                                                color: Colors.red)),
                                     // ElevatedButton(
                                     //     onPressed: () async {
                                     //       if (configurazioneTapparella.blob !=
@@ -545,13 +545,16 @@ class ConfigurazioneTapparelle extends StatefulWidget {
 class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
     with WidgetsBindingObserver {
   int? selectedId;
-  //bool _numberInputIsValid = true;
+
+  refresh() {
+    setState(() {});
+  }
 
   final List<bool> _numberInputIsValid = List.filled(9, true);
 
   List<FocusNode> focusNodeList = List.generate(9, (_) => FocusNode());
 
-  //DA MODIFICARE PER FARE PIU DI DUE TEXTFIELD//
+  ///DA MODIFICARE PER FARE PIU DI DUE TEXTFIELD//
   List<TextEditingController> textController =
       List.generate(15, (int i) => TextEditingController());
 
@@ -605,17 +608,41 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
 
   final _formKey = GlobalKey<FormState>();
 
+  bool shouldPop = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GestureDetector(
+        body: WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Configurazione tapparella'),
-        ),
+        appBar:
+            AppBar(title: const Text('Configurazione tapparella'), actions: [
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: const Text("ANNULLA",
+                  style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16))),
+          // FloatingActionButton(
+          //   backgroundColor: Colors.red,
+          //   //mini: true,
+          //   onPressed: () async {
+          //     Navigator.of(context).pop();
+          //   },
+          //   child: const Text("ANNULLA"))],
+        ]),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -677,10 +704,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[1]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[1] = false;
@@ -698,10 +725,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[1].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -716,10 +743,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[2]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[2] = false;
@@ -737,10 +764,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[2].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -748,40 +775,55 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
               ),
               const Divider(),
               const Text('Tipo'),
-              TendinaTipologia(text: tipoTapparelle, stringa: "tipoTapparelle",),
+              TendinaTipologia(
+                text: tipoTapparelle,
+                stringa: "tipoTapparelle",
+                notifyParent: refresh,
+              ),
               const Divider(),
               const Text('Profilo'),
-              TendinaTipologia(text: tipoProfiloTapparelle, stringa: "tipoProfiloTapparelle"),
+              TendinaTipologia(
+                text: tipoProfiloTapparelle,
+                stringa: "tipoProfiloTapparelle",
+                notifyParent: refresh,
+              ),
               const Divider(),
               const Text('DX/SX'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        textController[5].text = "Dx";
-                      },
-                      child: const Text("DX")),
-                  ElevatedButton(
-                      onPressed: () {
-                        textController[5].text = "Sx";
-                      },
-                      child: const Text("SX"))
-                ],
-              ),
-              TextField(
-                enabled: false,
-                scrollPadding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                textInputAction: TextInputAction.next,
-                controller: textController[5],
-              ),
+              DropdownVerso(
+                  text: tipoVersoTapparelle, stringa: "tipoVersoTapparelle"),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     ElevatedButton(
+              //         onPressed: () {
+              //           textController[5].text = "Dx";
+              //         },
+              //         child: const Text("DX")),
+              //     ElevatedButton(
+              //         onPressed: () {
+              //           textController[5].text = "Sx";
+              //         },
+              //         child: const Text("SX"))
+              //   ],
+              // ),
+              // TextField(
+              //   enabled: false,
+              //   scrollPadding: EdgeInsets.only(
+              //       bottom: MediaQuery.of(context).viewInsets.bottom),
+              //   textInputAction: TextInputAction.next,
+              //   controller: textController[5],
+              // ),
               const Divider(),
               const Text('Vetro'),
-              DropdownVetro(text: tipoVetroTapparelle, stringa: "tipoVetroTapparelle"),
+              DropdownVetro(
+                text: tipoVetroTapparelle,
+                stringa: "tipoVetroTapparelle",
+                tipoFinestra: tipoTapparelle,
+              ),
               const Divider(),
               const Text('Telaio'),
-              DropdownTelaio(text: tipoTelaioTapparelle, stringa: "tipoTelaioTapparelle"),
+              DropdownTelaio(
+                  text: tipoTelaioTapparelle, stringa: "tipoTelaioTapparelle"),
               const Divider(),
               const Text('Larghezza luce'),
               TextFormField(
@@ -791,10 +833,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[3]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[3] = false;
@@ -812,10 +854,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[3].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -830,10 +872,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[4]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[4] = false;
@@ -851,10 +893,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[4].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -869,10 +911,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[5]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[5] = false;
@@ -890,10 +932,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[5].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -908,10 +950,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[6]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[6] = false;
@@ -929,10 +971,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[6].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -947,10 +989,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[7]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[7] = false;
@@ -968,10 +1010,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[7].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -986,10 +1028,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 decoration: InputDecoration(
                   errorText: _numberInputIsValid[8]
                       ? null
-                      : "Inserisci un numero (es. 10.5)",
+                      : "Inserisci un intero (es. 10)",
                 ),
                 onChanged: (String val) {
-                  final v = double.tryParse(val);
+                  final v = int.tryParse(val);
                   if (v == null) {
                     setState(() {
                       _numberInputIsValid[8] = false;
@@ -1007,10 +1049,10 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null ||
-                      double.tryParse(value) == null ||
+                      int.tryParse(value) == null ||
                       value.isEmpty) {
                     focusNodeList[8].requestFocus();
-                    return 'Inserire un valore corretto es: 10.2';
+                    return 'Inserire un valore corretto es: 10';
                   }
                   return null;
                 },
@@ -1031,13 +1073,6 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
-                backgroundColor: Colors.red,
-                mini: true,
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                },
-                child: const Icon(Icons.cancel, size: 25)),
-            FloatingActionButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   selectedId != null
@@ -1046,23 +1081,23 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                               id: selectedId,
                               riferimento: textController[0].text,
                               quantita: int.parse(textController[1].text),
-                              larghezza: double.parse(textController[2].text),
-                              altezza: double.parse(textController[3].text),
+                              larghezza: int.parse(textController[2].text),
+                              altezza: int.parse(textController[3].text),
                               tipo: "$tipoTapparelle-$tipoProfiloTapparelle",
-                              dxsx: textController[5].text,
+                              dxsx: tipoVersoTapparelle,
                               vetro: tipoVetroTapparelle,
                               telaio: tipoTelaioTapparelle,
                               larghezzaLuce:
-                                  double.parse(textController[8].text),
-                              altezzaLuce: double.parse(textController[9].text),
+                                  int.parse(textController[8].text),
+                              altezzaLuce: int.parse(textController[9].text),
                               larghezzaCassonetto:
-                                  double.parse(textController[10].text),
+                                  int.parse(textController[10].text),
                               altezzaCassonetto:
-                                  double.parse(textController[11].text),
+                                  int.parse(textController[11].text),
                               spessoreCassonetto:
-                                  double.parse(textController[12].text),
+                                  int.parse(textController[12].text),
                               profonditaCielino:
-                                  double.parse(textController[13].text),
+                                  int.parse(textController[13].text),
                               note: textController[14].text,
                               idParente: widget.parentId,
                               disegno: widget.configurazioneTapparelle?.disegno,
@@ -1072,22 +1107,22 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                           Configurazione(
                             riferimento: textController[0].text,
                             quantita: int.parse(textController[1].text),
-                            larghezza: double.parse(textController[2].text),
-                            altezza: double.parse(textController[3].text),
+                            larghezza: int.parse(textController[2].text),
+                            altezza: int.parse(textController[3].text),
                             tipo: "$tipoTapparelle-$tipoProfiloTapparelle",
-                            dxsx: textController[5].text,
+                            dxsx: tipoVersoTapparelle,
                             vetro: tipoVetroTapparelle,
                             telaio: tipoTelaioTapparelle,
-                            larghezzaLuce: double.parse(textController[8].text),
-                            altezzaLuce: double.parse(textController[9].text),
+                            larghezzaLuce: int.parse(textController[8].text),
+                            altezzaLuce: int.parse(textController[9].text),
                             larghezzaCassonetto:
-                                double.parse(textController[10].text),
+                                int.parse(textController[10].text),
                             altezzaCassonetto:
-                                double.parse(textController[11].text),
+                                int.parse(textController[11].text),
                             spessoreCassonetto:
-                                double.parse(textController[12].text),
+                                int.parse(textController[12].text),
                             profonditaCielino:
-                                double.parse(textController[13].text),
+                                int.parse(textController[13].text),
                             note: textController[14].text,
                             idParente: widget.parentId,
                           ),
@@ -1098,7 +1133,7 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                     _larghezza = textController[2].text;
                     _altezza = textController[3].text;
                     //tipoTapparelle = textController[4].text;
-                    _dxsx = textController[5].text;
+                    //_dxsx = textController[5].text;
                     //_vetro = textController[6].text;
                     //_telaio = textController[7].text;
                     _larghezzaLuce = textController[8].text;
@@ -1127,20 +1162,23 @@ class _ConfigurazioneTapparelleState extends State<ConfigurazioneTapparelle>
                   });
                   Navigator.of(context).pop();
                 }
+                  setState(() {
+                    shouldPop = !shouldPop;
+                  });
               },
               child: const Icon(Icons.save),
             ),
           ],
         ),
       ),
-    ));
+    )));
   }
 }
 
-Future<Widget> numeroPosizioniTapparelle(RilievoTapparella rilievoTapparelle) async {
-
-  await DBHelper.instance.contaPosizioniTapparelle("configurazioneTapparelle", rilievoTapparelle);
+Future<Widget> numeroPosizioniTapparelle(
+    RilievoTapparella rilievoTapparelle) async {
+  await DBHelper.instance
+      .contaPosizioniTapparelle("configurazioneTapparelle", rilievoTapparelle);
 
   return Text("${rilievoTapparelle.posizioni} posizioni");
-
 }

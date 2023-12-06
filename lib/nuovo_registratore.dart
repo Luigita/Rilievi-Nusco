@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 //import 'package:flutter_sound_lite/flutter_sound.dart' as flutter_sound_lite;
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as rotation;
 
 import 'nuovo_database.dart';
 
@@ -63,14 +67,19 @@ class _SoundRecorderState extends State<SoundRecorder>{
                       base64Decode(snapshot.data!.blob.toString()),
                       gaplessPlayback: true,
                     ),
+                    buildTimer(),
+                    buildStart(),
+                    buildPlayer(),
+                    buildSave(snapshot),
                   ],
                 ),
               );
             },
           ),
-          buildTimer(),
-          buildStart(),
-          buildPlayer(),
+          // buildTimer(),
+          // buildStart(),
+          // buildPlayer(),
+          // buildSave(),
         ],
       )
     ),
@@ -137,7 +146,53 @@ class _SoundRecorderState extends State<SoundRecorder>{
     );
   }
   
-  //Widget buildSave() {} salvare nel database
+  Widget buildSave(AsyncSnapshot<Configurazione> snapshot) {
+
+
+
+    return FloatingActionButton(
+      child: widget.configurazione.id == null
+          ? const Icon(Icons.save, color: Colors.red)
+          : const Icon(Icons.save, color: Colors.white),
+      onPressed: () async {
+        try {
+          Duration? duration = await FlutterSoundHelper().duration('/data/data/luigita.it.rilievi_nusco/cache/$pathAudio');
+          
+          String audioVideoPath = await merge(base64Decode(snapshot.data!.blob!), '/data/data/luigita.it.rilievi_nusco/cache/$pathAudio', duration, widget.configurazione, widget.tipoConfigurazione);
+          //TODO: salva il video ma ruota l'immagine
+          final bytes = await File(audioVideoPath).readAsBytes();
+          final base64Video = base64Encode(bytes);
+
+          Configurazione? configurazione = await DBHelper.instance
+              .getConfigurazione(widget.configurazione.id!, widget.tipoConfigurazione);
+          DBHelper.instance.updateConfigurazione(
+              Configurazione(
+                id: widget.configurazione.id,
+                riferimento: configurazione.riferimento,
+                quantita: configurazione.quantita,
+                larghezza: configurazione.larghezza,
+                altezza: configurazione.altezza,
+                tipo: configurazione.tipo,
+                dxsx: configurazione.dxsx,
+                vetro: configurazione.vetro,
+                telaio: configurazione.telaio,
+                larghezzaLuce: configurazione.larghezzaLuce,
+                altezzaLuce: configurazione.altezzaLuce,
+                note: configurazione.note,
+                blob: configurazione.blob,
+                disegno: configurazione.disegno,
+                audioVideo: base64Video,
+                idParente: configurazione.idParente,
+              ),
+              widget.tipoConfigurazione);
+          Navigator.of(context).pop();
+        } catch (e) {
+          print(e);
+          Navigator.of(context).pop();
+        }
+      },
+    );
+  } ///salvare nel database
 
 }
 
@@ -295,6 +350,50 @@ class _TimerWidgetState extends State<TimerWidget>{
     throw UnimplementedError();
   }
 
+}
+
+Future<String> merge(List<int> photoData, String audioPath, Duration? tempoRegistrato, Configurazione configurazione, String tipoConfigurazione) async {
+  const outputVideoFileName = 'output.mp4';
+  final outputVideoPath =
+      '${(await getTemporaryDirectory()).path}/$outputVideoFileName';
+  final photoPath = '${(await getTemporaryDirectory()).path}/photo.jpg';
+
+  //final immagine = rotation.decodeImage(photoData.);
+
+  if (!await File(outputVideoPath).exists()) {
+    File(outputVideoPath).create();
+  }
+
+  // final immagine = await File(photoPath).writeAsBytes(photoData);
+  // final immagineRuotata = rotation.copyRotate(immagine as rotation.Image, angle: 90);
+  // await File(photoPath).writeAsBytes(immagineRuotata.getBytes());
+
+  await File(photoPath).writeAsBytes(photoData);
+
+  final FlutterFFmpeg flutterFFmpeg = FlutterFFmpeg();
+
+  ///********* argomenti per l'esecuzione del comando ffmpeg *********///
+
+  final arguments =
+      '-loop 1 -i $photoPath -i $audioPath -y -t ${tempoRegistrato?.inSeconds} $outputVideoPath';
+
+  ///****************************************************************///
+
+  int result = await flutterFFmpeg.execute(arguments);
+
+  if (result == 0) {
+    print('Video creato con successo!');
+
+    final videoBytes = await File(outputVideoPath).readAsBytes();
+    configurazione.audioVideo = base64Encode(videoBytes);
+    DBHelper.instance.updateConfigurazione(
+        configurazione, tipoConfigurazione);
+
+    return outputVideoPath;
+  } else {
+    print('Errore durante la creazione del video');
+    return "error";
+  }
 }
 
 String formatTime(Duration duration) {
