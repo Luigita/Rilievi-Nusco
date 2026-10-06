@@ -1,4 +1,4 @@
-# Rilievi Nusco - Android Application
+# Rilievi Nusco
 
 **Rilievi Nusco** è un'applicazione Android progettata per semplificare e digitalizzare il processo di rilevamento misure ed extended data entry sul campo per l'installazione di **persiane** e **tapparelle**.
 
