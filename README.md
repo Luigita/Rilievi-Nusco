@@ -42,15 +42,17 @@ Ogni posizione può essere arricchita con contenuti multimediali ed annotazioni 
 ---
 
 ## 📱 Screenshot dell'App
-https://github.com/user-attachments/assets/85314b89-f50c-427e-bc7c-b8e688f4a2b6
+
+
+https://github.com/user-attachments/assets/b1f30328-0d06-46b8-b5e2-6878cad5d785
+
+
 | Schermata Principale | Testata Rilievo | Tipologie Infissi |
 |<img width="1080" height="2400" alt="Screenshot_20261006-124237" src="https://github.com/user-attachments/assets/7272aa28-ef54-4ae0-ac19-035a40055308" />|
-| :---: | :---: | :---: |
 | Moduli Persiane e Tapparelle | Inserimento Dati Cliente | Selezione Profilo da Catalogo |
 
 | Configurazione Posizione | Disegno Canvas | Registrazione Audio |
 
-| :---: | :---: | :---: |
 | Selezione Schema Apertura | Schizzo Tecnico a Mano | Note Vocali di Cantiere |
 
 ---
