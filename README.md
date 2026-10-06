@@ -1,16 +1,72 @@
-# applicazione_prova
+# Rilievi Nusco - Android Application
 
-A new Flutter project.
+**Rilievi Nusco** è un'applicazione Android progettata per semplificare e digitalizzare il processo di rilevamento misure ed extended data entry sul campo per l'installazione di **persiane** e **tapparelle**.
 
-## Getting Started
+L'app consente ai tecnici e rilevatori della Nusco spa di raccogliere in modo preciso e strutturato tutte le specifiche tecniche, i rilievi dimensionali, i disegni a mano libera, le foto di cantiere e le note vocali, permettendo infine l'esportazione e condivisione rapida dell'intero pacchetto dati in formato zip.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Funzionalità Principali
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 1. Moduli di Rilevamento
+* **Modulo Persiane:** Gestione completa delle schede d'ordine e misurazioni per persiane.
+* **Modulo Tapparelle:** Sezione dedicata al rilevamento e configurazione delle tapparelle.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Gestione Testata Rilievo
+Per ogni cliente e cantiere è possibile definire le informazioni generali del rilievo:
+* Dati Cliente, Destinazione e Data intervento.
+* **Tipologia Infisso & Profilo:** Selezione da catalogo visuale (es. *PE72, GEA, LUMAX, CX700, CX850, RX450, SX110, HX160*, ecc.).
+* **Finiture e Colorazioni:** Selezione finitura interna/esterna (es. *00 Bianco Massa, 16 Rovere GEA*) e colorazione persiana (es. *RAL 9010 Bianco Puro Opaco*).
+* **Modello Persiana:** Selezione modello (es. *Iron*).
+* **Dimensioni di Riferimento:** Larghezza e altezza infissi e persiane.
+* **Elementi Accessori:** Configurazione di controtelaio, guide, coprifili interni/esterni, angolari ed accessori.
+
+### 3. Configurazione Posizioni / Misure
+All'interno di ogni rilievo è possibile aggiungere molteplici posizioni con specifiche avanzate:
+* **Misure:** Larghezza, Altezza, Larghezza luce, Altezza luce e Quantità.
+* **Tipologia Apertura:** Schemi grafici integrati per la selezione della tipologia (es. *F1AR, F2AR, F3AR, F4AR, F1AW, F2AW*).
+* **Specifiche Tecniche:** Modello profilo, verso di apertura (Dx/Sx), tipologia vetro e telaio (*es. Anta su Anta*).
+
+### 4. Allegati Multimedia e Note per Posizione
+Ogni posizione può essere arricchita con contenuti multimediali ed annotazioni per evitare errori in fase di produzione:
+* ✏️ **Disegno Tecnico / Sketch:** Strumento di canvas integrato per tracciare disegni a mano libera o schemi quotati.
+* 📸 **Scatto Fotografico:** Integrazione con la fotocamera per acquisire foto direttamente nel cantiere.
+* 🎙️ **Note Vocali:** Registratore audio integrato per registrare indicazioni o dettagli vocali.
+* 🔍 **Visualizzazione e Dettaglio:** Scheda riassuntiva di anteprima per ciascuna posizione con accesso rapido a foto, schizzi e riproduzione audio.
+
+### 5. Gestione Dati ed Esportazione
+* **Esportazione ZIP:** Generazione di un archivio `.zip` contenente tutti i dati, immagini e registrazioni audio del rilievo.
+* **Condivisione Integrata:** Invio rapido del file esportato tramite WhatsApp, Telegram, Email, Bluetooth o salvataggio su Google Drive.
+* **Gestione Memoria:** Opzione per l'eliminazione sicura di tutti i dati locali salvati.
+
+---
+
+## 📱 Screenshot dell'App
+https://github.com/user-attachments/assets/85314b89-f50c-427e-bc7c-b8e688f4a2b6
+| Schermata Principale | Testata Rilievo | Tipologie Infissi |
+|<img width="1080" height="2400" alt="Screenshot_20261006-124237" src="https://github.com/user-attachments/assets/7272aa28-ef54-4ae0-ac19-035a40055308" />|
+| :---: | :---: | :---: |
+| Moduli Persiane e Tapparelle | Inserimento Dati Cliente | Selezione Profilo da Catalogo |
+
+| Configurazione Posizione | Disegno Canvas | Registrazione Audio |
+
+| :---: | :---: | :---: |
+| Selezione Schema Apertura | Schizzo Tecnico a Mano | Note Vocali di Cantiere |
+
+---
+
+## ⚙️ Dettagli Tecnici
+
+* **Piattaforma:** Android
+* **Versione Testata:** 1.0.5 (Build 73)
+* **Permessi Richiesti:**
+  * Fotocamera (`CAMERA`) per lo scatto di foto.
+  * Microfono (`RECORD_AUDIO`) per le note vocali.
+  * Archiviazione per il salvataggio ed esportazione dei file ZIP.
+
+---
+
+## ✒️ Autore & Repository
+
+Progetto sviluppato per la gestione dei rilievi per i prodotti Nusco.  
+Repository GitHub: [Luigita/Rilievi-Nusco](https://github.com/Luigita/Rilievi-Nusco)
